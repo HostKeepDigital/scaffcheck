@@ -1,7 +1,10 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import BottomTabBar from '@/components/BottomTabBar';
+import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -21,8 +24,22 @@ import { AccountProvider } from '@/lib/AccountContext';
 import SubscriptionGate from '@/components/SubscriptionGate';
 import { Navigate } from 'react-router-dom';
 
+const pageVariants = {
+  initial: { opacity: 0, x: 30 },
+  animate: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: -30 },
+};
+
+const pageTransition = { duration: 0.25, ease: 'easeInOut' };
+
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError } = useAuth();
+  const location = useLocation();
+  useScrollRestoration();
+
+  const showTabBar = ['/dashboard', '/settings', '/operative'].some(
+    (p) => location.pathname === p || location.pathname.startsWith(p + '/')
+  );
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
@@ -38,23 +55,37 @@ const AuthenticatedApp = () => {
   }
 
   return (
-    <Routes>
-      <Route path="/" element={<Landing />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/upload/:token" element={<OperativeUpload />} />
-      <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
-        <Route element={<SubscriptionGate />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/operative/:id" element={<OperativeDetail />} />
-        </Route>
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/paywall" element={<Paywall />} />
-      </Route>
-      <Route path="*" element={<PageNotFound />} />
-    </Routes>
+    <>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={location.pathname}
+          variants={pageVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          transition={pageTransition}
+        >
+          <Routes location={location}>
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/upload/:token" element={<OperativeUpload />} />
+            <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+              <Route element={<SubscriptionGate />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/operative/:id" element={<OperativeDetail />} />
+              </Route>
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/paywall" element={<Paywall />} />
+            </Route>
+            <Route path="*" element={<PageNotFound />} />
+          </Routes>
+        </motion.div>
+      </AnimatePresence>
+      {showTabBar && <BottomTabBar />}
+    </>
   );
 };
 

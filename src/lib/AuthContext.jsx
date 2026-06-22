@@ -18,6 +18,20 @@ export const AuthProvider = ({ children }) => {
     checkAppState();
   }, []);
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const updateDarkClass = (e) => {
+      if (e.matches) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    };
+    updateDarkClass(mediaQuery);
+    mediaQuery.addEventListener('change', updateDarkClass);
+    return () => mediaQuery.removeEventListener('change', updateDarkClass);
+  }, []);
+
   const checkAppState = async () => {
     try {
       setIsLoadingPublicSettings(true);

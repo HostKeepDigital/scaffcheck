@@ -86,7 +86,33 @@
     @apply border-border outline-ring/50;
   }
 
+  html, body {
+    overscroll-behavior: none;
+    -webkit-overscroll-behavior: none;
+  }
+
   body {
     @apply bg-background text-foreground font-body;
+  }
+
+  button, a, nav, [role="button"], [role="link"] {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer utilities {
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .safe-area-pt {
+    padding-top: max(env(safe-area-inset-top), 0px);
+  }
+  .safe-area-pb {
+    padding-bottom: max(env(safe-area-inset-bottom), 0px);
   }
 }

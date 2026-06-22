@@ -8,17 +8,29 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Building2, CreditCard, Check, AlertCircle } from 'lucide-react';
+import { Loader2, Building2, CreditCard, Check, AlertCircle, Trash2 } from 'lucide-react';
 import { PLANS } from '@/lib/stripePrices';
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from '@/components/ui/alert-dialog';
 
 export default function Settings() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { account, loading, refreshAccount } = useAccount();
   const navigate = useNavigate();
   const [companyName, setCompanyName] = useState('');
   const [selectedPlan, setSelectedPlan] = useState('founding');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [deleting, setDeleting] = useState(false);
 
   const handleStartTrial = async () => {
     setError('');
@@ -79,6 +91,19 @@ export default function Settings() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    setError('');
+    try {
+      await base44.functions.invoke('deleteAccount', {});
+      logout(false);
+      window.location.href = '/';
+    } catch (err) {
+      setError(err.message || 'Failed to delete account');
+      setDeleting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F8F9FA]">
@@ -91,7 +116,7 @@ export default function Settings() {
   return (
     <div className="min-h-screen bg-[#F8F9FA]">
       <AppHeader />
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 pb-24">
         <h1 className="text-2xl font-bold text-[#0F172A] mb-6">Settings</h1>
 
         {error && (
@@ -180,6 +205,40 @@ export default function Settings() {
               </CardContent>
             </Card>
           </div>
+        )}
+
+        {account && (
+          <Card className="border-red-200">
+            <CardHeader><CardTitle className="flex items-center gap-2 text-red-700"><Trash2 className="w-5 h-5" /> Danger Zone</CardTitle></CardHeader>
+            <CardContent>
+              <p className="text-sm text-slate-500 mb-4">Permanently delete your account and all associated data, including operatives and compliance documents. This action cannot be undone.</p>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" disabled={deleting}>
+                    {deleting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />}
+                    Delete Account
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete your account?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently delete your company account, all operative records, all compliance documents, and all upload invites. This action is irreversible and all data will be lost. Your subscription will also be cancelled.
+                  </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDeleteAccount}
+                      className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      Yes, delete everything
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>

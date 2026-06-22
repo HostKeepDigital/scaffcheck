@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, FileDown, Loader2, ChevronRight } from 'lucide-react';
 import { getOperativeCompliance } from '@/lib/compliance';
 import { generateComplianceReport } from '@/lib/pdfReport';
+import PullToRefresh from '@/components/PullToRefresh';
 
 export default function Dashboard() {
   const { account } = useAccount();
@@ -63,7 +64,8 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-[#F8F9FA]">
       <AppHeader />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+      <PullToRefresh onRefresh={loadData}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 pb-24">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <div>
             <h1 className="text-2xl font-bold text-[#0F172A]">Operatives</h1>
@@ -141,6 +143,7 @@ export default function Dashboard() {
         )}
       </div>
 
+      </PullToRefresh>
       <OperativeForm open={showForm} onClose={() => setShowForm(false)} accountId={account?.id} onSaved={loadData} />
     </div>
   );

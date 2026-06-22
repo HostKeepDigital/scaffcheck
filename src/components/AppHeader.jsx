@@ -13,7 +13,8 @@ export default function AppHeader({ showNav = true }) {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#0F172A] text-white border-b border-slate-700/50">
+    <header className="sticky top-0 z-40 bg-[#0F172A] text-white border-b border-slate-700/50"
+      style={{ paddingTop: 'max(env(safe-area-inset-top), 0px)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
         <Link to={isAuthenticated ? '/dashboard' : '/'} className="flex items-center gap-2 font-bold text-lg">
           <HardHat className="w-5 h-5 text-amber-400" />
