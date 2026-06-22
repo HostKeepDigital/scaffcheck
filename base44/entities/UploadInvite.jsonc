@@ -1,0 +1,32 @@
+{
+  "name": "UploadInvite",
+  "type": "object",
+  "properties": {
+    "account_id": {
+      "type": "string"
+    },
+    "operative_id": {
+      "type": "string"
+    },
+    "token": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "account_id",
+    "operative_id",
+    "token"
+  ]
+}

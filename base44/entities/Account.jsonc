@@ -1,0 +1,46 @@
+{
+  "name": "Account",
+  "type": "object",
+  "properties": {
+    "company_name": {
+      "type": "string"
+    },
+    "owner_user_id": {
+      "type": "string"
+    },
+    "subscription_status": {
+      "type": "string",
+      "enum": [
+        "trial_active",
+        "active",
+        "lapsed"
+      ],
+      "default": "trial_active"
+    },
+    "trial_ends_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "stripe_customer_id": {
+      "type": "string"
+    },
+    "stripe_subscription_id": {
+      "type": "string"
+    },
+    "plan": {
+      "type": "string",
+      "enum": [
+        "founding",
+        "standard"
+      ]
+    },
+    "operative_count": {
+      "type": "integer",
+      "default": 0
+    }
+  },
+  "required": [
+    "company_name",
+    "owner_user_id"
+  ]
+}

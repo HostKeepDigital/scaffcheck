@@ -1,0 +1,42 @@
+{
+  "name": "ComplianceDocument",
+  "type": "object",
+  "properties": {
+    "account_id": {
+      "type": "string"
+    },
+    "operative_id": {
+      "type": "string"
+    },
+    "document_type": {
+      "type": "string",
+      "enum": [
+        "CISRS Card",
+        "Public Liability Insurance",
+        "Employers Liability Insurance",
+        "RAMS"
+      ]
+    },
+    "file_url": {
+      "type": "string"
+    },
+    "issue_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "expiry_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "uploaded_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "account_id",
+    "operative_id",
+    "document_type",
+    "file_url"
+  ]
+}

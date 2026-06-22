@@ -1,0 +1,32 @@
+{
+  "name": "Operative",
+  "type": "object",
+  "properties": {
+    "account_id": {
+      "type": "string"
+    },
+    "full_name": {
+      "type": "string"
+    },
+    "company_name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string",
+      "default": "Scaffolder"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "account_id",
+    "full_name"
+  ]
+}
