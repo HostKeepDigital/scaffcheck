@@ -105,9 +105,9 @@ export default function DocumentForm({ open, onClose, operativeId, accountId, on
 
           <div className="space-y-1.5">
             <Label>Document file *</Label>
-            <div className="border-2 border-dashed border-slate-300 rounded-lg p-4 text-center">
+            <div className="border-2 border-dashed border-border rounded-lg p-4 text-center">
               {fileUrl ? (
-                <div className="flex items-center justify-center gap-2 text-sm text-green-600">
+                <div className="flex items-center justify-center gap-2 text-sm text-green-600 dark:text-green-400">
                   <Check className="w-4 h-4" /> <span className="truncate max-w-[200px]">{fileName}</span>
                   <Button type="button" variant="ghost" size="sm" className="ml-2 text-xs" onClick={() => { setFileUrl(''); setFileName(''); }}>
                     Change
@@ -115,15 +115,15 @@ export default function DocumentForm({ open, onClose, operativeId, accountId, on
                 </div>
               ) : (
                 <label className="cursor-pointer flex flex-col items-center gap-1">
-                  <Upload className="w-6 h-6 text-slate-400" />
-                  <span className="text-sm text-slate-500">
+                  <Upload className="w-6 h-6 text-muted-foreground/70" />
+                  <span className="text-sm text-muted-foreground">
                     {uploading ? 'Uploading...' : extracting ? 'Reading document...' : 'Click to upload'}
                   </span>
                   <input type="file" className="hidden" accept=".pdf,.png,.jpg,.jpeg" onChange={handleFileChange} disabled={uploading || extracting} />
                 </label>
               )}
               {(uploading || extracting) && (
-                <div className="mt-2 flex items-center justify-center gap-1.5 text-xs text-slate-500">
+                <div className="mt-2 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
                   <Loader2 className="w-3 h-3 animate-spin" />
                   {uploading ? 'Uploading...' : 'AI extracting dates...'}
                 </div>
@@ -135,26 +135,26 @@ export default function DocumentForm({ open, onClose, operativeId, accountId, on
             <div className="space-y-1.5">
               <Label className="flex items-center gap-1">
                 Issue date
-                {aiIssue && <span className="inline-flex items-center gap-0.5 text-[10px] text-amber-600 font-medium"><Sparkles className="w-3 h-3" /> AI</span>}
+                {aiIssue && <span className="inline-flex items-center gap-0.5 text-[10px] text-amber-600 dark:text-amber-400 font-medium"><Sparkles className="w-3 h-3" /> AI</span>}
               </Label>
               <Input
                 type="date" value={issueDate}
                 onChange={(e) => { setIssueDate(e.target.value); handleDateEdit('issue'); }}
                 className={aiIssue ? 'border-amber-500 ring-1 ring-amber-500' : ''}
               />
-              {aiIssue && <p className="text-[10px] text-amber-600 flex items-center gap-0.5"><Sparkles className="w-3 h-3" /> Suggested by AI — please confirm</p>}
+              {aiIssue && <p className="text-[10px] text-amber-600 dark:text-amber-400 flex items-center gap-0.5"><Sparkles className="w-3 h-3" /> Suggested by AI — please confirm</p>}
             </div>
             <div className="space-y-1.5">
               <Label className="flex items-center gap-1">
                 Expiry date *
-                {aiExpiry && <span className="inline-flex items-center gap-0.5 text-[10px] text-amber-600 font-medium"><Sparkles className="w-3 h-3" /> AI</span>}
+                {aiExpiry && <span className="inline-flex items-center gap-0.5 text-[10px] text-amber-600 dark:text-amber-400 font-medium"><Sparkles className="w-3 h-3" /> AI</span>}
               </Label>
               <Input
                 type="date" value={expiryDate}
                 onChange={(e) => { setExpiryDate(e.target.value); handleDateEdit('expiry'); }}
                 className={aiExpiry ? 'border-amber-500 ring-1 ring-amber-500' : ''}
               />
-              {aiExpiry && <p className="text-[10px] text-amber-600 flex items-center gap-0.5"><Sparkles className="w-3 h-3" /> Suggested by AI — please confirm</p>}
+              {aiExpiry && <p className="text-[10px] text-amber-600 dark:text-amber-400 flex items-center gap-0.5"><Sparkles className="w-3 h-3" /> Suggested by AI — please confirm</p>}
             </div>
           </div>
 

@@ -106,21 +106,21 @@ export default function Settings() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8F9FA]">
+      <div className="min-h-screen bg-background">
         <AppHeader />
-        <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-slate-400" /></div>
+        <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground/70" /></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA]">
+    <div className="min-h-screen bg-background">
       <AppHeader />
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 pb-24">
-        <h1 className="text-2xl font-bold text-[#0F172A] mb-6">Settings</h1>
+        <h1 className="text-2xl font-bold text-foreground mb-6">Settings</h1>
 
         {error && (
-          <div className="mb-4 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm flex items-start gap-2">
+          <div className="mb-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 text-sm flex items-start gap-2">
             <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" /> {error}
           </div>
         )}
@@ -149,16 +149,16 @@ export default function Settings() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {PLANS.map((plan) => (
                     <button key={plan.id} onClick={() => setSelectedPlan(plan.id)}
-                      className={`text-left p-4 rounded-xl border-2 transition ${selectedPlan === plan.id ? 'border-amber-500 bg-amber-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                      className={`text-left p-4 rounded-xl border-2 transition ${selectedPlan === plan.id ? 'border-amber-500 bg-amber-500/10' : 'border-border hover:border-amber-500/50'}`}>
                       {plan.badge && <span className="inline-block px-2 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-bold mb-1">{plan.badge}</span>}
                       <div className="font-semibold">{plan.name}</div>
-                      <div className="text-2xl font-bold mt-1">{plan.priceLabel}<span className="text-sm font-normal text-slate-500">{plan.period}</span></div>
-                      <p className="text-xs text-slate-500 mt-1">{plan.description}</p>
+                      <div className="text-2xl font-bold mt-1">{plan.priceLabel}<span className="text-sm font-normal text-muted-foreground">{plan.period}</span></div>
+                      <p className="text-xs text-muted-foreground mt-1">{plan.description}</p>
                     </button>
                   ))}
                 </div>
-                <div className="mt-4 flex items-center gap-2 text-sm text-slate-500">
-                  <Check className="w-4 h-4 text-green-600" /> 7-day free trial · Card required · Cancel anytime
+                <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+                  <Check className="w-4 h-4 text-green-600 dark:text-green-400" /> 7-day free trial · Card required · Cancel anytime
                 </div>
                 <Button className="w-full mt-4 bg-amber-500 hover:bg-amber-600 text-white font-semibold h-11"
                   onClick={handleStartTrial} disabled={saving}>
@@ -184,11 +184,11 @@ export default function Settings() {
               <CardHeader><CardTitle className="flex items-center gap-2"><CreditCard className="w-5 h-5" /> Billing</CardTitle></CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500">Plan</span>
+                  <span className="text-muted-foreground">Plan</span>
                   <span className="font-medium capitalize">{account.plan}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500">Status</span>
+                  <span className="text-muted-foreground">Status</span>
                   <span className="font-medium">
                     {account.subscription_status === 'trial_active' && 'Trial active'}
                     {account.subscription_status === 'active' && 'Active'}
@@ -196,7 +196,7 @@ export default function Settings() {
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500">Operatives tracked</span>
+                  <span className="text-muted-foreground">Operatives tracked</span>
                   <span className="font-medium">{account.operative_count}</span>
                 </div>
                 <Button variant="outline" className="w-full" onClick={handleManageBilling} disabled={saving}>
@@ -208,10 +208,10 @@ export default function Settings() {
         )}
 
         {account && (
-          <Card className="border-red-200">
-            <CardHeader><CardTitle className="flex items-center gap-2 text-red-700"><Trash2 className="w-5 h-5" /> Danger Zone</CardTitle></CardHeader>
+          <Card className="border-red-200 dark:border-red-900/50">
+            <CardHeader><CardTitle className="flex items-center gap-2 text-red-700 dark:text-red-400"><Trash2 className="w-5 h-5" /> Danger Zone</CardTitle></CardHeader>
             <CardContent>
-              <p className="text-sm text-slate-500 mb-4">Permanently delete your account and all associated data, including operatives and compliance documents. This action cannot be undone.</p>
+              <p className="text-sm text-muted-foreground mb-4">Permanently delete your account and all associated data, including operatives and compliance documents. This action cannot be undone.</p>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" disabled={deleting}>

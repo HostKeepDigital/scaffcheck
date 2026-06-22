@@ -41,23 +41,23 @@ export default function Paywall() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8F9FA]">
+      <div className="min-h-screen bg-background">
         <AppHeader />
-        <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-slate-400" /></div>
+        <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground/70" /></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA]">
+    <div className="min-h-screen bg-background">
       <AppHeader />
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-amber-100 mb-4">
-            <ShieldAlert className="w-7 h-7 text-amber-600" />
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-amber-500/15 mb-4">
+            <ShieldAlert className="w-7 h-7 text-amber-600 dark:text-amber-400" />
           </div>
-          <h1 className="text-2xl font-bold text-[#0F172A]">Subscription required</h1>
-          <p className="text-slate-500 mt-2 max-w-md mx-auto">
+          <h1 className="text-2xl font-bold text-foreground">Subscription required</h1>
+          <p className="text-muted-foreground mt-2 max-w-md mx-auto">
             {account?.subscription_status === 'lapsed'
               ? 'Your subscription has lapsed. Resubscribe to restore access to your operatives and compliance data.'
               : 'Your free trial has ended. Choose a plan to continue tracking your operatives\' compliance.'}
@@ -65,7 +65,7 @@ export default function Paywall() {
         </div>
 
         {error && (
-          <div className="mb-4 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm flex items-start gap-2">
+          <div className="mb-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 text-sm flex items-start gap-2">
             <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" /> {error}
           </div>
         )}
@@ -80,9 +80,9 @@ export default function Paywall() {
               <CardContent>
                 <div className="flex items-baseline gap-1 mb-2">
                   <span className="text-3xl font-bold">{plan.priceLabel}</span>
-                  <span className="text-slate-500">{plan.period}</span>
+                  <span className="text-muted-foreground">{plan.period}</span>
                 </div>
-                <p className="text-sm text-slate-500 mb-4">{plan.description}</p>
+                <p className="text-sm text-muted-foreground mb-4">{plan.description}</p>
                 <Button className={`w-full ${plan.highlight ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}
                   onClick={() => handleSubscribe(plan.id)} disabled={subscribing !== null}>
                   {subscribing === plan.id ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Redirecting...</> : 'Subscribe'}
@@ -93,7 +93,7 @@ export default function Paywall() {
         </div>
 
         <div className="mt-6 text-center">
-          <Button variant="link" onClick={() => navigate('/settings')} className="text-slate-500">Manage account settings</Button>
+          <Button variant="link" onClick={() => navigate('/settings')} className="text-muted-foreground">Manage account settings</Button>
         </div>
       </div>
     </div>

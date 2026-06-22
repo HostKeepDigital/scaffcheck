@@ -136,19 +136,19 @@ export default function OperativeDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8F9FA]">
+      <div className="min-h-screen bg-background">
         <AppHeader />
-        <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-slate-400" /></div>
+        <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground/70" /></div>
       </div>
     );
   }
 
   if (!operative) {
     return (
-      <div className="min-h-screen bg-[#F8F9FA]">
+      <div className="min-h-screen bg-background">
         <AppHeader />
         <div className="text-center py-20">
-          <p className="text-slate-500">Operative not found.</p>
+          <p className="text-muted-foreground">Operative not found.</p>
           <Button variant="link" onClick={() => navigate('/dashboard')}>Back to Dashboard</Button>
         </div>
       </div>
@@ -165,23 +165,23 @@ export default function OperativeDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA]">
+    <div className="min-h-screen bg-background">
       <AppHeader />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
-        <button onClick={() => navigate('/dashboard')} className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-4">
+        <button onClick={() => navigate('/dashboard')} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4">
           <ChevronLeft className="w-4 h-4" /> Dashboard
         </button>
 
         {/* Operative header */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
+        <div className="bg-card rounded-xl border border-border p-5 mb-6">
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
             <div>
-              <h1 className="text-xl font-bold text-[#0F172A]">{operative.full_name}</h1>
-              <div className="mt-1 space-y-0.5 text-sm text-slate-500">
+              <h1 className="text-xl font-bold text-foreground">{operative.full_name}</h1>
+              <div className="mt-1 space-y-0.5 text-sm text-muted-foreground">
                 {operative.company_name && <p>{operative.company_name}</p>}
                 <p>{operative.email || 'No email'} · {operative.phone || 'No phone'}</p>
                 <p className="text-xs">{operative.role}</p>
-                {operative.notes && <p className="text-xs mt-1 text-slate-400">{operative.notes}</p>}
+                {operative.notes && <p className="text-xs mt-1 text-muted-foreground/70">{operative.notes}</p>}
               </div>
             </div>
             <div className="flex flex-col items-start sm:items-end gap-2">
@@ -196,7 +196,7 @@ export default function OperativeDetail() {
 
         {/* Action buttons */}
         <div className="flex flex-wrap gap-2 mb-6">
-          <Button size="sm" onClick={() => setShowDocForm(true)} className="bg-[#0F172A] hover:bg-slate-800">
+          <Button size="sm" onClick={() => setShowDocForm(true)} className="bg-primary text-primary-foreground hover:bg-primary/90">
             <Plus className="w-4 h-4 mr-1.5" /> Add Document
           </Button>
           <Button size="sm" variant="outline" onClick={handleInvite} disabled={inviting}>
@@ -215,23 +215,23 @@ export default function OperativeDetail() {
             const versions = docsByType[ds.type] || [];
             const currentDoc = versions[0] || null;
             return (
-              <div key={ds.type} className="bg-white rounded-xl border border-slate-200 p-4">
+              <div key={ds.type} className="bg-card rounded-xl border border-border p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-sm text-[#0F172A]">{ds.type}</span>
+                      <span className="font-medium text-sm text-foreground">{ds.type}</span>
                       <DocStatusBadge status={ds.status} />
                     </div>
                     {currentDoc ? (
-                      <div className="mt-1.5 text-xs text-slate-500 flex items-center gap-3">
+                      <div className="mt-1.5 text-xs text-muted-foreground flex items-center gap-3">
                         <span>Expires: {formatDate(currentDoc.expiry_date)}</span>
                         {currentDoc.issue_date && <span>Issued: {formatDate(currentDoc.issue_date)}</span>}
-                        <a href={currentDoc.file_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline flex items-center gap-0.5">
+                        <a href={currentDoc.file_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-0.5">
                           <ExternalLink className="w-3 h-3" /> View
                         </a>
                       </div>
                     ) : (
-                      <p className="mt-1 text-xs text-slate-400">No document uploaded</p>
+                      <p className="mt-1 text-xs text-muted-foreground/70">No document uploaded</p>
                     )}
                   </div>
                   <div className="flex items-center gap-1">
@@ -244,15 +244,15 @@ export default function OperativeDetail() {
                 </div>
 
                 {showHistory === ds.type && versions.length > 1 && (
-                  <div className="mt-3 pt-3 border-t border-slate-100 space-y-2">
+                  <div className="mt-3 pt-3 border-t border-border space-y-2">
                     {versions.map((v, i) => (
                       <div key={v.id} className="flex items-center justify-between text-xs">
                         <div className="flex items-center gap-2">
-                          <span className={`px-1.5 py-0.5 rounded ${i === 0 ? 'bg-green-100 text-green-700 font-medium' : 'bg-slate-100 text-slate-500'}`}>
+                          <span className={`px-1.5 py-0.5 rounded ${i === 0 ? 'bg-green-500/15 text-green-700 dark:text-green-300 font-medium' : 'bg-muted text-muted-foreground'}`}>
                             {i === 0 ? 'Current' : `v${versions.length - i}`}
                           </span>
-                          <span className="text-slate-500">Expires {formatDate(v.expiry_date)}</span>
-                          <a href={v.file_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View</a>
+                          <span className="text-muted-foreground">Expires {formatDate(v.expiry_date)}</span>
+                          <a href={v.file_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">View</a>
                         </div>
                         <Button size="sm" variant="ghost" className="h-6 text-destructive" onClick={() => setDeleteDocId(v.id)}>
                           <Trash className="w-3 h-3" />

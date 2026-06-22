@@ -43,11 +43,11 @@ export default function DocTypePicker({ value, onChange }) {
                   setDrawerOpen(false);
                 }}
                 className={`w-full text-left px-4 py-3 rounded-lg flex items-center justify-between transition-colors ${
-                  value === t ? 'bg-amber-50 text-amber-900' : 'hover:bg-slate-50'
+                  value === t ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300' : 'hover:bg-muted'
                 }`}
               >
                 <span className="text-sm font-medium">{t}</span>
-                {value === t && <Check className="w-4 h-4 text-amber-600" />}
+                {value === t && <Check className="w-4 h-4 text-amber-600 dark:text-amber-400" />}
               </button>
             ))}
           </div>

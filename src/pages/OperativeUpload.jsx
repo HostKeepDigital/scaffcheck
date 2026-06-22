@@ -90,7 +90,7 @@ export default function OperativeUpload() {
 
   if (validating) {
     return (
-      <div className="min-h-screen bg-[#0F172A] text-white flex items-center justify-center">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-amber-400 mx-auto" />
           <p className="mt-3 text-sm text-slate-400">Verifying your link...</p>
@@ -101,7 +101,7 @@ export default function OperativeUpload() {
 
   if (!valid) {
     return (
-      <div className="min-h-screen bg-[#0F172A] text-white flex items-center justify-center px-4">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-4">
         <div className="text-center max-w-sm">
           <AlertCircle className="w-12 h-12 text-amber-400 mx-auto mb-3" />
           <h1 className="text-xl font-bold mb-2">Link invalid</h1>
@@ -116,7 +116,7 @@ export default function OperativeUpload() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-[#0F172A] text-white flex items-center justify-center px-4">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-4">
         <div className="text-center max-w-sm">
           <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
           <h1 className="text-xl font-bold mb-2">Documents submitted</h1>
@@ -129,9 +129,9 @@ export default function OperativeUpload() {
   const hasAnyFile = Object.values(docs).some((d) => d.fileUrl);
 
   return (
-    <div className="min-h-screen bg-[#0F172A] text-white">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <div className="border-b border-slate-700/50 px-4 py-4">
+      <div className="border-b border-border px-4 py-4">
         <div className="max-w-lg mx-auto flex items-center gap-2">
           <HardHat className="w-5 h-5 text-amber-400" />
           <span className="font-bold">ScaffCheck</span>
@@ -140,13 +140,13 @@ export default function OperativeUpload() {
 
       <div className="max-w-lg mx-auto px-4 py-6">
         <h1 className="text-xl font-bold mb-1">Upload your documents</h1>
-        <p className="text-sm text-slate-400 mb-6">Hi {operativeName}, upload your compliance documents below. Take a clear photo of each document.</p>
+        <p className="text-sm text-muted-foreground mb-6">Hi {operativeName}, upload your compliance documents below. Take a clear photo of each document.</p>
 
         <div className="space-y-4">
           {REQUIRED_DOC_TYPES.map((type) => {
             const d = docs[type] || emptyDoc;
             return (
-              <div key={type} className="bg-slate-800/50 rounded-xl border border-slate-700/50 p-4">
+              <div key={type} className="bg-card rounded-xl border border-border p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <FileText className="w-4 h-4 text-amber-400" />
                   <span className="font-medium text-sm">{type}</span>
@@ -154,16 +154,16 @@ export default function OperativeUpload() {
 
                 {!d.fileUrl ? (
                   <label className="block">
-                    <div className="border-2 border-dashed border-slate-600 rounded-lg p-4 text-center cursor-pointer hover:border-amber-500 transition">
+                    <div className="border-2 border-dashed border-border rounded-lg p-4 text-center cursor-pointer hover:border-amber-500 transition">
                       {d.uploading || d.extracting ? (
                         <div className="flex flex-col items-center gap-1">
                           <Loader2 className="w-5 h-5 animate-spin text-amber-400" />
-                          <span className="text-xs text-slate-400">{d.uploading ? 'Uploading...' : 'Reading document...'}</span>
+                          <span className="text-xs text-muted-foreground">{d.uploading ? 'Uploading...' : 'Reading document...'}</span>
                         </div>
                       ) : (
                         <div className="flex flex-col items-center gap-1">
-                          <Upload className="w-5 h-5 text-slate-400" />
-                          <span className="text-xs text-slate-400">Tap to upload</span>
+                          <Upload className="w-5 h-5 text-muted-foreground/70" />
+                          <span className="text-xs text-muted-foreground">Tap to upload</span>
                         </div>
                       )}
                     </div>
@@ -171,29 +171,29 @@ export default function OperativeUpload() {
                   </label>
                 ) : (
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-green-400">
+                    <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
                       <Check className="w-4 h-4" />
                       <span className="truncate flex-1">{d.fileName}</span>
-                      <button className="text-xs text-slate-400 hover:text-white" onClick={() => updateDoc(type, { ...emptyDoc })}>Remove</button>
+                      <button className="text-xs text-muted-foreground hover:text-foreground" onClick={() => updateDoc(type, { ...emptyDoc })}>Remove</button>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <Label className="text-xs text-slate-400 flex items-center gap-0.5">
+                        <Label className="text-xs text-muted-foreground flex items-center gap-0.5">
                           Issue date {d.aiIssue && <Sparkles className="w-3 h-3 text-amber-400" />}
                         </Label>
                         <Input type="date" value={d.issueDate} onChange={(e) => updateDoc(type, { issueDate: e.target.value, aiIssue: false })}
-                          className="bg-slate-900 border-slate-600 text-white text-sm h-9 mt-1" />
+                          className="bg-input border-input text-foreground text-sm h-9 mt-1" />
                       </div>
                       <div>
-                        <Label className="text-xs text-slate-400 flex items-center gap-0.5">
+                        <Label className="text-xs text-muted-foreground flex items-center gap-0.5">
                           Expiry date {d.aiExpiry && <Sparkles className="w-3 h-3 text-amber-400" />}
                         </Label>
                         <Input type="date" value={d.expiryDate} onChange={(e) => updateDoc(type, { expiryDate: e.target.value, aiExpiry: false })}
-                          className="bg-slate-900 border-slate-600 text-white text-sm h-9 mt-1" />
+                          className="bg-input border-input text-foreground text-sm h-9 mt-1" />
                       </div>
                     </div>
                     {(d.aiIssue || d.aiExpiry) && (
-                      <p className="text-[10px] text-amber-400 flex items-center gap-0.5"><Sparkles className="w-3 h-3" /> Suggested by AI — please confirm</p>
+                      <p className="text-[10px] text-amber-600 dark:text-amber-400 flex items-center gap-0.5"><Sparkles className="w-3 h-3" /> Suggested by AI — please confirm</p>
                     )}
                   </div>
                 )}
@@ -206,7 +206,7 @@ export default function OperativeUpload() {
           onClick={handleSubmit} disabled={!hasAnyFile || submitting}>
           {submitting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Submitting...</> : 'Submit documents'}
         </Button>
-        {!hasAnyFile && <p className="text-center text-xs text-slate-500 mt-2">Upload at least one document to submit</p>}
+        {!hasAnyFile && <p className="text-center text-xs text-muted-foreground mt-2">Upload at least one document to submit</p>}
       </div>
     </div>
   );
