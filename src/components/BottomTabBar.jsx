@@ -17,6 +17,14 @@ export default function BottomTabBar() {
     return location.pathname === path;
   };
 
+  const handleTabClick = (path) => {
+    // If already on the tab's root, just replace (no-op visually). If on a
+    // sub-page of that tab, navigate back to the tab root to reset the stack.
+    if (location.pathname !== path) {
+      navigate(path);
+    }
+  };
+
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-40 bg-[#0F172A] border-t border-slate-700/50"
@@ -29,7 +37,7 @@ export default function BottomTabBar() {
           return (
             <button
               key={tab.path}
-              onClick={() => navigate(tab.path)}
+              onClick={() => handleTabClick(tab.path)}
               className={`flex flex-col items-center gap-0.5 px-8 py-1.5 transition-colors ${
                 active ? 'text-amber-400' : 'text-slate-400'
               }`}

@@ -25,15 +25,15 @@ export default function AppHeader({ showNav = true }) {
           <nav className="flex items-center gap-1 sm:gap-2">
             {isAuthenticated ? (
               <>
-                <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white hover:bg-slate-700/50"
+                <Button variant="ghost" size="sm" className="hidden sm:inline-flex text-slate-300 hover:text-white hover:bg-slate-700/50"
                   onClick={() => navigate('/dashboard')}>
                   <LayoutDashboard className="w-4 h-4 sm:mr-1.5" />
-                  <span className="hidden sm:inline">Dashboard</span>
+                  <span>Dashboard</span>
                 </Button>
-                <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white hover:bg-slate-700/50"
+                <Button variant="ghost" size="sm" className="hidden sm:inline-flex text-slate-300 hover:text-white hover:bg-slate-700/50"
                   onClick={() => navigate('/settings')}>
                   <Settings className="w-4 h-4 sm:mr-1.5" />
-                  <span className="hidden sm:inline">Settings</span>
+                  <span>Settings</span>
                 </Button>
                 <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white hover:bg-slate-700/50"
                   onClick={handleLogout}>
