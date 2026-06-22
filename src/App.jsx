@@ -6,10 +6,23 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
-// Add page imports here
+import Landing from './pages/Landing';
+import Dashboard from './pages/Dashboard';
+import OperativeDetail from './pages/OperativeDetail';
+import Settings from './pages/Settings';
+import Paywall from './pages/Paywall';
+import OperativeUpload from './pages/OperativeUpload';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { AccountProvider } from '@/lib/AccountContext';
+import SubscriptionGate from '@/components/SubscriptionGate';
+import { Navigate } from 'react-router-dom';
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, authError } = useAuth();
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
@@ -20,21 +33,26 @@ const AuthenticatedApp = () => {
     );
   }
 
-  // Handle authentication errors
-  if (authError) {
-    if (authError.type === 'user_not_registered') {
-      return <UserNotRegisteredError />;
-    } else if (authError.type === 'auth_required') {
-      // Redirect to login automatically
-      navigateToLogin();
-      return null;
-    }
+  if (authError && authError.type === 'user_not_registered') {
+    return <UserNotRegisteredError />;
   }
 
-  // Render the main app
   return (
     <Routes>
-      {/* Add your page Route elements here */}
+      <Route path="/" element={<Landing />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/upload/:token" element={<OperativeUpload />} />
+      <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+        <Route element={<SubscriptionGate />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/operative/:id" element={<OperativeDetail />} />
+        </Route>
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/paywall" element={<Paywall />} />
+      </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
@@ -48,7 +66,9 @@ function App() {
       <QueryClientProvider client={queryClientInstance}>
         <Router>
           <ScrollToTop />
-          <AuthenticatedApp />
+          <AccountProvider>
+            <AuthenticatedApp />
+          </AccountProvider>
         </Router>
         <Toaster />
       </QueryClientProvider>
