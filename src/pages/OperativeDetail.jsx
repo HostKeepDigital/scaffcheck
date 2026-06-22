@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAccount } from '@/lib/AccountContext';
 import AppHeader from '@/components/AppHeader';
@@ -17,9 +18,7 @@ export default function OperativeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { account } = useAccount();
-  const [operative, setOperative] = useState(null);
-  const [documents, setDocuments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [showOpForm, setShowOpForm] = useState(false);
   const [showDocForm, setShowDocForm] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
@@ -28,21 +27,50 @@ export default function OperativeDetail() {
   const [inviting, setInviting] = useState(false);
   const [reporting, setReporting] = useState(false);
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    try {
+  const { data, isLoading: loading, refetch } = useQuery({
+    queryKey: ['operative', id],
+    queryFn: async () => {
       const [op, docs] = await Promise.all([
         base44.entities.Operative.get(id),
         base44.entities.ComplianceDocument.filter({ operative_id: id }, '-uploaded_at'),
       ]);
-      setOperative(op);
-      setDocuments(docs || []);
-    } finally {
-      setLoading(false);
-    }
-  }, [id]);
+      return { operative: op, documents: docs || [] };
+    },
+    enabled: !!id,
+  });
 
-  useEffect(() => { loadData(); }, [loadData]);
+  const operative = data?.operative;
+  const documents = data?.documents || [];
+
+  const createDocMutation = useMutation({
+    mutationFn: async (docData) => {
+      return await base44.entities.ComplianceDocument.create(docData);
+    },
+    onMutate: async (docData) => {
+      await queryClient.cancelQueries({ queryKey: ['operative', id] });
+      const previous = queryClient.getQueryData(['operative', id]);
+      const tempDoc = {
+        ...docData,
+        id: 'temp-' + Date.now(),
+        created_date: new Date().toISOString(),
+      };
+      queryClient.setQueryData(['operative', id], (old) => ({
+        ...old,
+        documents: [...(old?.documents || []), tempDoc],
+      }));
+      return { previous };
+    },
+    onError: (_err, _docData, context) => {
+      queryClient.setQueryData(['operative', id], context.previous);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['operative', id] });
+    },
+  });
+
+  const loadData = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
 
   const { rag, documentStatuses } = getOperativeCompliance(documents);
 
@@ -240,7 +268,14 @@ export default function OperativeDetail() {
       </div>
 
       <OperativeForm open={showOpForm} onClose={() => setShowOpForm(false)} operative={operative} onSaved={loadData} />
-      <DocumentForm open={showDocForm} onClose={() => setShowDocForm(false)} operativeId={operative.id} accountId={account?.id} onSaved={loadData} />
+      <DocumentForm
+        open={showDocForm}
+        onClose={() => setShowDocForm(false)}
+        operativeId={operative.id}
+        accountId={account?.id}
+        onSaved={loadData}
+        onCreate={createDocMutation.mutateAsync}
+      />
 
       <AlertDialog open={showDelete} onOpenChange={setShowDelete}>
         <AlertDialogContent>

@@ -4,11 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import DocTypePicker from '@/components/DocTypePicker';
 import { Loader2, Upload, Sparkles, FileText, Check } from 'lucide-react';
-import { REQUIRED_DOC_TYPES } from '@/lib/compliance';
 
-export default function DocumentForm({ open, onClose, operativeId, accountId, onSaved }) {
+export default function DocumentForm({ open, onClose, operativeId, accountId, onSaved, onCreate }) {
   const [docType, setDocType] = useState('');
   const [fileUrl, setFileUrl] = useState('');
   const [fileName, setFileName] = useState('');
@@ -68,7 +67,7 @@ export default function DocumentForm({ open, onClose, operativeId, accountId, on
     if (!expiryDate) { setError('Expiry date is required'); return; }
     setSaving(true);
     try {
-      await base44.entities.ComplianceDocument.create({
+      const docData = {
         account_id: accountId,
         operative_id: operativeId,
         document_type: docType,
@@ -76,7 +75,12 @@ export default function DocumentForm({ open, onClose, operativeId, accountId, on
         issue_date: issueDate || null,
         expiry_date: expiryDate,
         uploaded_at: new Date().toISOString(),
-      });
+      };
+      if (onCreate) {
+        await onCreate(docData);
+      } else {
+        await base44.entities.ComplianceDocument.create(docData);
+      }
       onSaved?.();
       handleClose();
     } catch (err) {
@@ -96,14 +100,7 @@ export default function DocumentForm({ open, onClose, operativeId, accountId, on
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
             <Label>Document type *</Label>
-            <Select value={docType} onValueChange={setDocType}>
-              <SelectTrigger><SelectValue placeholder="Select type..." /></SelectTrigger>
-              <SelectContent>
-                {REQUIRED_DOC_TYPES.map((t) => (
-                  <SelectItem key={t} value={t}>{t}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <DocTypePicker value={docType} onChange={setDocType} />
           </div>
 
           <div className="space-y-1.5">

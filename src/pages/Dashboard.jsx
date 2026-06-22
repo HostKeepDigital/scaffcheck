@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAccount } from '@/lib/AccountContext';
 import AppHeader from '@/components/AppHeader';
@@ -15,28 +16,58 @@ import PullToRefresh from '@/components/PullToRefresh';
 export default function Dashboard() {
   const { account } = useAccount();
   const navigate = useNavigate();
-  const [operatives, setOperatives] = useState([]);
-  const [documents, setDocuments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [reporting, setReporting] = useState(false);
 
-  const loadData = useCallback(async () => {
-    if (!account) return;
-    setLoading(true);
-    try {
+  const { data, isLoading: loading, refetch } = useQuery({
+    queryKey: ['dashboard', account?.id],
+    queryFn: async () => {
+      if (!account) return { operatives: [], documents: [] };
       const [ops, docs] = await Promise.all([
         base44.entities.Operative.filter({ account_id: account.id }),
         base44.entities.ComplianceDocument.filter({ account_id: account.id }),
       ]);
-      setOperatives(ops || []);
-      setDocuments(docs || []);
-    } finally {
-      setLoading(false);
-    }
-  }, [account]);
+      return { operatives: ops || [], documents: docs || [] };
+    },
+    enabled: !!account,
+  });
 
-  useEffect(() => { loadData(); }, [loadData]);
+  const operatives = data?.operatives || [];
+  const documents = data?.documents || [];
+
+  const createOperativeMutation = useMutation({
+    mutationFn: async (opData) => {
+      const op = await base44.entities.Operative.create(opData);
+      const ops = await base44.entities.Operative.filter({ account_id: opData.account_id });
+      await base44.entities.Account.update(opData.account_id, { operative_count: ops.length });
+      return op;
+    },
+    onMutate: async (opData) => {
+      await queryClient.cancelQueries({ queryKey: ['dashboard', account.id] });
+      const previous = queryClient.getQueryData(['dashboard', account.id]);
+      const tempOp = {
+        ...opData,
+        id: 'temp-' + Date.now(),
+        created_date: new Date().toISOString(),
+      };
+      queryClient.setQueryData(['dashboard', account.id], (old) => ({
+        ...old,
+        operatives: [...(old?.operatives || []), tempOp],
+      }));
+      return { previous };
+    },
+    onError: (_err, _opData, context) => {
+      queryClient.setQueryData(['dashboard', account.id], context.previous);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['dashboard', account.id] });
+    },
+  });
+
+  const loadData = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
 
   const docsByOperative = {};
   for (const doc of documents) {
@@ -144,7 +175,13 @@ export default function Dashboard() {
       </div>
 
       </PullToRefresh>
-      <OperativeForm open={showForm} onClose={() => setShowForm(false)} accountId={account?.id} onSaved={loadData} />
+      <OperativeForm
+        open={showForm}
+        onClose={() => setShowForm(false)}
+        accountId={account?.id}
+        onSaved={loadData}
+        onCreate={createOperativeMutation.mutateAsync}
+      />
     </div>
   );
 }

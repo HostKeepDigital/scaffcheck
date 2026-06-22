@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Loader2 } from 'lucide-react';
 
-export default function OperativeForm({ open, onClose, operative, accountId, onSaved }) {
+export default function OperativeForm({ open, onClose, operative, accountId, onSaved, onCreate }) {
   const [fullName, setFullName] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [email, setEmail] = useState('');
@@ -42,13 +42,18 @@ export default function OperativeForm({ open, onClose, operative, accountId, onS
           full_name: fullName, company_name: companyName, email, phone, role, notes,
         });
       } else {
-        await base44.entities.Operative.create({
+        const opData = {
           account_id: accountId, full_name: fullName, company_name: companyName,
           email, phone, role, notes,
-        });
-        await base44.entities.Account.update(accountId, {
-          operative_count: (await base44.entities.Operative.filter({ account_id: accountId })).length,
-        });
+        };
+        if (onCreate) {
+          await onCreate(opData);
+        } else {
+          await base44.entities.Operative.create(opData);
+          await base44.entities.Account.update(accountId, {
+            operative_count: (await base44.entities.Operative.filter({ account_id: accountId })).length,
+          });
+        }
       }
       onSaved?.();
       onClose();
