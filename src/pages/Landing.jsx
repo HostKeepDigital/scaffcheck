@@ -117,7 +117,10 @@ export default function Landing() {
             <HardHat className="w-4 h-4 text-amber-400" />
             <span className="text-sm font-medium">ScaffKeep</span>
           </div>
-          <p className="text-xs text-slate-500">Compliance tracking for UK scaffolding contractors</p>
+          <div className="text-right">
+            <p className="text-xs text-slate-500">Compliance tracking for UK scaffolding contractors</p>
+            <p className="text-xs text-slate-600 mt-1">ScaffKeep — a Keep Technologies Ltd product.</p>
+          </div>
         </div>
       </footer>
     </div>

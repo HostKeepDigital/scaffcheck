@@ -20,7 +20,7 @@ export const PLANS = [
     price: 79,
     priceLabel: '£79',
     period: '/month',
-    description: 'Full access to all ScaffCheck features.',
+    description: 'Full access to all ScaffKeep features.',
     highlight: false,
     badge: null,
   },

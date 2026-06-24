@@ -85,7 +85,7 @@ Deno.serve(async (req) => {
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: contractorEmail,
           subject,
-          body: `The following compliance documents ${dayLabel}:\n\n${body}\n\nPlease log in to ScaffKeep to review and take action if needed.`,
+          body: `The following compliance documents ${dayLabel}:\n\n${body}\n\nPlease log in to ScaffKeep to review and take action if needed.\n\nScaffKeep — a Keep Technologies Ltd product.`,
         });
         totalSent++;
       }
