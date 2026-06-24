@@ -31,8 +31,10 @@ Deno.serve(async (req) => {
         trialEnd.setDate(trialEnd.getDate() + 7);
 
         const existing = await base44.asServiceRole.entities.Account.filter({ owner_user_id: userId });
+        let accountId;
         if (existing && existing.length > 0) {
-          await base44.asServiceRole.entities.Account.update(existing[0].id, {
+          accountId = existing[0].id;
+          await base44.asServiceRole.entities.Account.update(accountId, {
             subscription_status: 'trial_active',
             trial_ends_at: trialEnd.toISOString(),
             stripe_customer_id: session.customer,
@@ -40,7 +42,7 @@ Deno.serve(async (req) => {
             plan,
           });
         } else {
-          await base44.asServiceRole.entities.Account.create({
+          const newAccount = await base44.asServiceRole.entities.Account.create({
             company_name: companyName,
             owner_user_id: userId,
             subscription_status: 'trial_active',
@@ -50,7 +52,11 @@ Deno.serve(async (req) => {
             plan,
             operative_count: 0,
           });
+          accountId = newAccount.id;
         }
+        // Link the user to this account so RLS can scope their data.
+        // Service role bypasses FLS on the account_id field.
+        await base44.asServiceRole.entities.User.update(userId, { account_id: accountId });
         break;
       }
 

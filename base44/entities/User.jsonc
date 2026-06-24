@@ -1,4 +1,6 @@
 {
+  "name": "User",
+  "type": "object",
   "properties": {
     "role": {
       "type": "string",
@@ -7,11 +9,21 @@
         "admin",
         "user"
       ]
+    },
+    "account_id": {
+      "type": "string",
+      "description": "The account this user belongs to. Set by the platform (service role) on account creation; users cannot change it.",
+      "rls": {
+        "read": true,
+        "write": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
     }
   },
   "required": [
     "role"
-  ],
-  "name": "User",
-  "type": "object"
+  ]
 }

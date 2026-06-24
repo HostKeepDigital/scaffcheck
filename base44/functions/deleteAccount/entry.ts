@@ -16,6 +16,8 @@ Deno.serve(async (req) => {
     await base44.entities.UploadInvite.deleteMany({ account_id: account.id });
     await base44.entities.Operative.deleteMany({ account_id: account.id });
     await base44.entities.Account.delete(account.id);
+    // Clear the immutable account_id link (service role bypasses FLS).
+    await base44.asServiceRole.entities.User.update(user.id, { account_id: null });
 
     return Response.json({ success: true });
   } catch (error) {
