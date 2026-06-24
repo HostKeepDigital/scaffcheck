@@ -22,7 +22,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2 font-bold text-lg">
             <HardHat className="w-5 h-5 text-amber-400" />
-            ScaffCheck
+            ScaffKeep
           </div>
           <div className="flex items-center gap-2">
             {isAuthenticated ? (
@@ -115,7 +115,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-slate-400">
             <HardHat className="w-4 h-4 text-amber-400" />
-            <span className="text-sm font-medium">ScaffCheck</span>
+            <span className="text-sm font-medium">ScaffKeep</span>
           </div>
           <p className="text-xs text-slate-500">Compliance tracking for UK scaffolding contractors</p>
         </div>

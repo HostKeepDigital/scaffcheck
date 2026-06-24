@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
 
       for (const [threshold, items] of Object.entries(remindersByThreshold)) {
         const dayLabel = threshold === '0' ? 'expires TODAY' : `expires in ${threshold} day${threshold === '1' ? '' : 's'}`;
-        const subject = `ScaffCheck: ${items.length} document${items.length === 1 ? '' : 's'} ${dayLabel}`;
+        const subject = `ScaffKeep: ${items.length} document${items.length === 1 ? '' : 's'} ${dayLabel}`;
 
         const body = items.map(item =>
           `• ${item.operative_name} — ${item.document_type} — expires ${item.expiry_date}`
@@ -85,7 +85,7 @@ Deno.serve(async (req) => {
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: contractorEmail,
           subject,
-          body: `The following compliance documents ${dayLabel}:\n\n${body}\n\nPlease log in to ScaffCheck to review and take action if needed.`,
+          body: `The following compliance documents ${dayLabel}:\n\n${body}\n\nPlease log in to ScaffKeep to review and take action if needed.`,
         });
         totalSent++;
       }

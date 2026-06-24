@@ -27,13 +27,13 @@ export function generateComplianceReport(companyName, operatives, documentsByOpe
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');
-  doc.text(companyName || 'ScaffCheck', margin, 13);
+  doc.text(companyName || 'ScaffKeep', margin, 13);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
   doc.text(`Report generated: ${dateStr}`, margin, 21);
-  doc.text('ScaffCheck Compliance Report', pageWidth - margin, 21, { align: 'right' });
+  doc.text('ScaffKeep Compliance Report', pageWidth - margin, 21, { align: 'right' });
 
   y = 36;
   doc.setTextColor(15, 23, 42);
@@ -121,7 +121,7 @@ export function generateComplianceReport(companyName, operatives, documentsByOpe
     y += 8;
   }
 
-  doc.save(`ScaffCheck-Compliance-Report-${now.toLocaleDateString('en-GB').replace(/\//g, '-')}.pdf`);
+  doc.save(`ScaffKeep-Compliance-Report-${now.toLocaleDateString('en-GB').replace(/\//g, '-')}.pdf`);
 }
 
 export function generateSingleOperativeReport(companyName, operative, documents) {

@@ -134,7 +134,7 @@ export default function OperativeUpload() {
       <div className="border-b border-border px-4 py-4">
         <div className="max-w-lg mx-auto flex items-center gap-2">
           <HardHat className="w-5 h-5 text-amber-400" />
-          <span className="font-bold">ScaffCheck</span>
+          <span className="font-bold">ScaffKeep</span>
         </div>
       </div>
 
