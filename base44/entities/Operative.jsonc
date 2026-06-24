@@ -33,15 +33,7 @@
     "create": {
       "$or": [
         {
-          "data.account_id": {
-            "_exists_in": {
-              "entity": "Account",
-              "field": "id",
-              "filter": {
-                "data.owner_user_id": "{{user.id}}"
-              }
-            }
-          }
+          "data.account_id": "{{user.data.account_id}}"
         },
         {
           "user_condition": {
@@ -53,15 +45,7 @@
     "read": {
       "$or": [
         {
-          "data.account_id": {
-            "_exists_in": {
-              "entity": "Account",
-              "field": "id",
-              "filter": {
-                "data.owner_user_id": "{{user.id}}"
-              }
-            }
-          }
+          "data.account_id": "{{user.data.account_id}}"
         },
         {
           "user_condition": {
@@ -73,15 +57,7 @@
     "update": {
       "$or": [
         {
-          "data.account_id": {
-            "_exists_in": {
-              "entity": "Account",
-              "field": "id",
-              "filter": {
-                "data.owner_user_id": "{{user.id}}"
-              }
-            }
-          }
+          "data.account_id": "{{user.data.account_id}}"
         },
         {
           "user_condition": {
@@ -93,15 +69,7 @@
     "delete": {
       "$or": [
         {
-          "data.account_id": {
-            "_exists_in": {
-              "entity": "Account",
-              "field": "id",
-              "filter": {
-                "data.owner_user_id": "{{user.id}}"
-              }
-            }
-          }
+          "data.account_id": "{{user.data.account_id}}"
         },
         {
           "user_condition": {
