@@ -14,7 +14,7 @@ const STATUS_COLORS = {
   missing: [107, 114, 128],
 };
 
-export function generateComplianceReport(companyName, operatives, documentsByOperative) {
+export function generateComplianceReport(companyName, operatives, documentsByOperative, scope = 'Company', operativeName = '') {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -121,9 +121,13 @@ export function generateComplianceReport(companyName, operatives, documentsByOpe
     y += 8;
   }
 
-  doc.save(`ScaffKeep-Compliance-Report-${now.toLocaleDateString('en-GB').replace(/\//g, '-')}.pdf`);
+  const pad = (n) => String(n).padStart(2, '0');
+  const stamp = `${pad(now.getDate())}-${pad(now.getMonth() + 1)}-${now.getFullYear()}_${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
+  const sanitize = (s) => String(s || '').replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '');
+  const scopePart = (scope === 'Operative' && operativeName) ? `Operative-${sanitize(operativeName)}` : 'Company';
+  doc.save(`ScaffKeep-Compliance-Report-${scopePart}-${stamp}.pdf`);
 }
 
 export function generateSingleOperativeReport(companyName, operative, documents) {
-  generateComplianceReport(companyName, [operative], { [operative.id]: documents });
+  generateComplianceReport(companyName, [operative], { [operative.id]: documents }, 'Operative', operative.full_name);
 }
