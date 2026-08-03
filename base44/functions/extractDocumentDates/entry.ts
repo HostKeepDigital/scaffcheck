@@ -3,8 +3,10 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const { file_url } = await req.json();
+    const user = await base44.auth.me();
+    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
+    const { file_url } = await req.json();
     if (!file_url) return Response.json({ error: 'Missing file_url' }, { status: 400 });
 
     const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
