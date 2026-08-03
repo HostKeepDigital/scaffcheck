@@ -195,6 +195,11 @@ export default function Settings() {
                     {account.subscription_status === 'lapsed' && 'Lapsed'}
                   </span>
                 </div>
+                {account.subscription_status === 'trial_active' && account.trial_ends_at && (
+                  <p className="text-xs text-muted-foreground">
+                    Trial expires {new Date(account.trial_ends_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}. Your subscription will auto-renew after the trial ends.
+                  </p>
+                )}
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Operatives tracked</span>
                   <span className="font-medium">{account.operative_count}</span>
