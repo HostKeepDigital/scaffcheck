@@ -4,9 +4,11 @@ import Stripe from 'npm:stripe@18.3.0';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const { plan, company_name, user_id } = await req.json();
+    const user = await base44.auth.me();
+    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
-    if (!user_id) return Response.json({ error: 'Missing user_id' }, { status: 400 });
+    const { plan, company_name } = await req.json();
+    const user_id = user.id;
 
     const priceMap = {
       founding: 'price_1Tl6ZJG98uz9Nro6zXvcC47U',

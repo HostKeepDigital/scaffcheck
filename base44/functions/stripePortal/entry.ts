@@ -4,11 +4,10 @@ import Stripe from 'npm:stripe@18.3.0';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const { user_id } = await req.json();
+    const user = await base44.auth.me();
+    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
-    if (!user_id) return Response.json({ error: 'Missing user_id' }, { status: 400 });
-
-    const accounts = await base44.asServiceRole.entities.Account.filter({ owner_user_id: user_id });
+    const accounts = await base44.asServiceRole.entities.Account.filter({ owner_user_id: user.id });
     if (!accounts || accounts.length === 0) {
       return Response.json({ error: 'No account found' }, { status: 404 });
     }
