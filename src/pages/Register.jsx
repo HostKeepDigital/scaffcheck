@@ -45,7 +45,7 @@ export default function Register() {
       if (result?.access_token) {
         base44.auth.setToken(result.access_token);
       }
-      window.location.href = "/settings";
+      window.location.href = "/dashboard";
     } catch (err) {
       setError(err.message || "Invalid verification code");
     } finally {
@@ -67,7 +67,7 @@ export default function Register() {
   };
 
   const handleGoogle = () => {
-    base44.auth.loginWithProvider("google", "/settings");
+    base44.auth.loginWithProvider("google", "/dashboard");
   };
 
   if (showOtp) {

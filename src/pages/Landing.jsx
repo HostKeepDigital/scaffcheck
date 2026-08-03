@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { HardHat, ShieldCheck, BellRing, FileText, Upload, ArrowRight, Check } from 'lucide-react';
@@ -7,6 +7,10 @@ import { PLANS } from '@/lib/stripePrices';
 export default function Landing() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const features = [
     { icon: ShieldCheck, title: 'RAG Dashboard', desc: 'See at a glance who is compliant, who needs action, and who is non-compliant — colour-coded Red, Amber, Green.' },
