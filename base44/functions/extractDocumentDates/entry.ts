@@ -1,45 +1,69 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 
-Deno.serve(async (req) => {
+const DOC_TYPES = ['CISRS Card', 'Public Liability Insurance', 'Employers Liability Insurance', 'RAMS'];
+
+export default async function (req) {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { file_url } = await req.json();
+    const { file_url, expected_type } = await req.json();
     if (!file_url) return Response.json({ error: 'Missing file_url' }, { status: 400 });
 
+    const expected = DOC_TYPES.includes(expected_type) ? expected_type : null;
+
     const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
-      prompt: `You are a compliance document analyser for UK scaffolding compliance. Examine the uploaded document (image or PDF) and extract:
-1. The issue date (if visible on the document)
-2. The expiry date / valid until date (if visible on the document)
+      prompt: `You are a compliance document analyser for UK scaffolding compliance. Examine the uploaded document (image or PDF) and classify it, judge its legibility, and extract its key dates.
+
+${expected ? `The uploader submitted this document under the slot: "${expected}". Judge independently what the document actually is, then say whether it matches.` : 'No expected document type was provided.'}
+
+Document type guidance:
+- "CISRS Card": a standardised scaffolder record card with CISRS branding, a photo, a registration number, a grade and an expiry date.
+- "Public Liability Insurance" and "Employers Liability Insurance": insurance certificates identified by the cover type named on the document plus its indemnity limit and period of insurance. A single combined policy may cover BOTH — if so, note that in issues and set detected_type to whichever cover matches the expected type${expected ? ` ("${expected}")` : ', or the primary cover if no expected type was given'}.
+- "RAMS": a bespoke Risk Assessment and Method Statement with no fixed layout — identify it by content (hazards, control measures, method steps, site/date) at moderate confidence. Do NOT judge whether the RAMS is adequate, only that it is a RAMS-type document.
+- "Other": anything that is none of the above.
 
 Return a JSON object with:
-- issue_date: "YYYY-MM-DD" format, or null if not found
-- expiry_date: "YYYY-MM-DD" format, or null if not found
-- confidence: "high", "medium", or "low"
+- detected_type: one of "CISRS Card", "Public Liability Insurance", "Employers Liability Insurance", "RAMS", "Other"
+- matches_expected: true/false if an expected type was given above (true only if detected_type equals it exactly), otherwise null
+- legible: false if the document is too blurry, blank, cropped or low-quality to read its key details, otherwise true
+- confidence: number between 0 and 1 for the classification
+- issue_date: the document's issue/start date as "YYYY-MM-DD", or null if not clearly visible
+- expiry_date: the document's expiry/valid-until/end date as "YYYY-MM-DD", or null if not clearly visible
+- issues: array of short plain-English problem descriptions, e.g. "Looks like a CISRS card but was uploaded under RAMS", "Too blurry to read the expiry date", "No policy number or indemnity limit found". Empty array if there are no problems.
 
 Rules:
-- Only extract dates that are clearly visible on the document.
-- Do NOT guess or invent dates.
-- If the document is a card (e.g. CISRS card), the expiry date is typically the "Valid Until" or "Expiry" date.
-- If the document is an insurance certificate, look for the policy expiry/valid-to date.
-- If the document is RAMS (Risk Assessment and Method Statement), look for review/expiry dates.
+- Only extract dates clearly visible on the document. Do NOT guess or invent dates.
+- For a card, the expiry is typically the "Valid Until" or "Expiry" date. For insurance, use the policy expiry / valid-to date. For RAMS, use review/expiry dates.
 - Return null for any date you cannot find with reasonable confidence.`,
       file_urls: [file_url],
       response_json_schema: {
         type: 'object',
         properties: {
+          detected_type: { type: 'string', enum: [...DOC_TYPES, 'Other'] },
+          matches_expected: { type: ['boolean', 'null'] },
+          legible: { type: 'boolean' },
+          confidence: { type: 'number' },
           issue_date: { type: ['string', 'null'] },
           expiry_date: { type: ['string', 'null'] },
-          confidence: { type: 'string', enum: ['high', 'medium', 'low'] },
+          issues: { type: 'array', items: { type: 'string' } },
         },
+        required: ['detected_type', 'legible', 'confidence', 'issue_date', 'expiry_date', 'issues'],
       },
     });
 
-    return Response.json(result);
+    return Response.json({
+      detected_type: result?.detected_type ?? 'Other',
+      matches_expected: expected ? result?.detected_type === expected : null,
+      legible: result?.legible !== false,
+      confidence: typeof result?.confidence === 'number' ? result.confidence : 0,
+      issue_date: result?.issue_date ?? null,
+      expiry_date: result?.expiry_date ?? null,
+      issues: Array.isArray(result?.issues) ? result.issues : [],
+    });
   } catch (error) {
-    console.error('Date extraction error:', error);
+    console.error('Document analysis error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
-});
+}
