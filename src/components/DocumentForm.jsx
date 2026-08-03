@@ -6,6 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import DocTypePicker from '@/components/DocTypePicker';
 import { Loader2, Upload, Sparkles, FileText, Check } from 'lucide-react';
+import { classifyVerdict } from '@/lib/docVerdict';
+import DocVerdictNotice from '@/components/DocVerdictNotice';
 
 export default function DocumentForm({ open, onClose, operativeId, accountId, onSaved, onCreate }) {
   const [docType, setDocType] = useState('');
@@ -19,10 +21,13 @@ export default function DocumentForm({ open, onClose, operativeId, accountId, on
   const [extracting, setExtracting] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [verdict, setVerdict] = useState(null);
+  const [overrideConfirmed, setOverrideConfirmed] = useState(false);
 
   const resetForm = () => {
     setDocType(''); setFileUrl(''); setFileName(''); setIssueDate(''); setExpiryDate('');
     setAiIssue(false); setAiExpiry(false); setError('');
+    setVerdict(null); setOverrideConfirmed(false);
   };
 
   const handleClose = () => {
@@ -37,15 +42,22 @@ export default function DocumentForm({ open, onClose, operativeId, accountId, on
     setUploading(true);
     setFileUrl(''); setFileName(''); setIssueDate(''); setExpiryDate('');
     setAiIssue(false); setAiExpiry(false);
+    setVerdict(null); setOverrideConfirmed(false);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setFileUrl(file_url);
       setFileName(file.name);
       setExtracting(true);
-      const response = await base44.functions.invoke('extractDocumentDates', { file_url });
-      const result = response.data;
+      let result = null;
+      try {
+        const response = await base44.functions.invoke('extractDocumentDates', { file_url, expected_type: docType || undefined });
+        result = response.data;
+      } catch (analysisError) {
+        console.error('Document analysis failed:', analysisError);
+      }
       if (result?.issue_date) { setIssueDate(result.issue_date); setAiIssue(true); }
       if (result?.expiry_date) { setExpiryDate(result.expiry_date); setAiExpiry(true); }
+      setVerdict(classifyVerdict(result, docType));
     } catch (err) {
       setError(err.message || 'Upload failed');
     } finally {
@@ -65,6 +77,11 @@ export default function DocumentForm({ open, onClose, operativeId, accountId, on
     if (!docType) { setError('Please select a document type'); return; }
     if (!fileUrl) { setError('Please upload a file'); return; }
     if (!expiryDate) { setError('Expiry date is required'); return; }
+    if (verdict?.outcome === 'block') { setError(verdict.message); return; }
+    if (verdict?.outcome === 'warn' && !overrideConfirmed) {
+      setError('Please confirm this is the right document before saving.');
+      return;
+    }
     setSaving(true);
     try {
       const docData = {
@@ -131,6 +148,8 @@ export default function DocumentForm({ open, onClose, operativeId, accountId, on
             </div>
           </div>
 
+          <DocVerdictNotice verdict={verdict} confirmed={overrideConfirmed} onConfirmChange={setOverrideConfirmed} />
+
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label className="flex items-center gap-1">
@@ -158,7 +177,7 @@ export default function DocumentForm({ open, onClose, operativeId, accountId, on
             </div>
           </div>
 
-          <Button type="submit" className="w-full" disabled={saving || uploading || extracting}>
+          <Button type="submit" className="w-full" disabled={saving || uploading || extracting || verdict?.outcome === 'block' || (verdict?.outcome === 'warn' && !overrideConfirmed)}>
             {saving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...</> : 'Save document'}
           </Button>
         </form>

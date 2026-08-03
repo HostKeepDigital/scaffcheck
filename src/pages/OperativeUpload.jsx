@@ -6,8 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { HardHat, Loader2, Upload, Sparkles, Check, FileText, CheckCircle2, AlertCircle } from 'lucide-react';
 import { REQUIRED_DOC_TYPES } from '@/lib/compliance';
+import { classifyVerdict } from '@/lib/docVerdict';
+import DocVerdictNotice from '@/components/DocVerdictNotice';
 
-const emptyDoc = { file: null, fileUrl: '', fileName: '', issueDate: '', expiryDate: '', aiIssue: false, aiExpiry: false, uploading: false, extracting: false };
+const emptyDoc = { file: null, fileUrl: '', fileName: '', issueDate: '', expiryDate: '', aiIssue: false, aiExpiry: false, uploading: false, extracting: false, verdict: null, overrideConfirmed: false };
 
 export default function OperativeUpload() {
   const { token } = useParams();
@@ -42,6 +44,9 @@ export default function OperativeUpload() {
     validate();
   }, [token]);
 
+  const isDocReady = (d) =>
+    d.verdict?.outcome !== 'block' && !(d.verdict?.outcome === 'warn' && !d.overrideConfirmed);
+
   const updateDoc = (type, updates) => {
     setDocs((prev) => ({ ...prev, [type]: { ...prev[type], ...updates } }));
   };
@@ -53,14 +58,21 @@ export default function OperativeUpload() {
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       updateDoc(type, { fileUrl: file_url, fileName: file.name, uploading: false, extracting: true });
-      const response = await base44.functions.invoke('extractDocumentDates', { file_url });
-      const result = response.data;
+      let result = null;
+      try {
+        const response = await base44.functions.invoke('extractDocumentDates', { file_url, expected_type: type });
+        result = response.data;
+      } catch (analysisError) {
+        console.error('Document analysis failed:', analysisError);
+      }
       updateDoc(type, {
         extracting: false,
         issueDate: result?.issue_date || '',
         expiryDate: result?.expiry_date || '',
         aiIssue: !!result?.issue_date,
         aiExpiry: !!result?.expiry_date,
+        verdict: classifyVerdict(result, type),
+        overrideConfirmed: false,
       });
     } catch {
       updateDoc(type, { uploading: false, extracting: false });
@@ -71,7 +83,7 @@ export default function OperativeUpload() {
     setSubmitting(true);
     try {
       const documents = REQUIRED_DOC_TYPES
-        .filter((t) => docs[t].fileUrl)
+        .filter((t) => docs[t].fileUrl && isDocReady(docs[t]))
         .map((t) => ({
           document_type: t,
           file_url: docs[t].fileUrl,
@@ -127,6 +139,9 @@ export default function OperativeUpload() {
   }
 
   const hasAnyFile = Object.values(docs).some((d) => d.fileUrl);
+  const hasBlockedDoc = Object.values(docs).some((d) => d.fileUrl && d.verdict?.outcome === 'block');
+  const hasUnconfirmedDoc = Object.values(docs).some((d) => d.fileUrl && d.verdict?.outcome === 'warn' && !d.overrideConfirmed);
+  const canSubmit = hasAnyFile && !hasBlockedDoc && !hasUnconfirmedDoc;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -195,6 +210,11 @@ export default function OperativeUpload() {
                     {(d.aiIssue || d.aiExpiry) && (
                       <p className="text-[10px] text-amber-600 dark:text-amber-400 flex items-center gap-0.5"><Sparkles className="w-3 h-3" /> Suggested by AI — please confirm</p>
                     )}
+                    <DocVerdictNotice
+                      verdict={d.verdict}
+                      confirmed={d.overrideConfirmed}
+                      onConfirmChange={(v) => updateDoc(type, { overrideConfirmed: v })}
+                    />
                   </div>
                 )}
               </div>
@@ -203,10 +223,12 @@ export default function OperativeUpload() {
         </div>
 
         <Button className="w-full mt-6 bg-amber-500 hover:bg-amber-600 text-white font-semibold h-12"
-          onClick={handleSubmit} disabled={!hasAnyFile || submitting}>
+          onClick={handleSubmit} disabled={!canSubmit || submitting}>
           {submitting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Submitting...</> : 'Submit documents'}
         </Button>
         {!hasAnyFile && <p className="text-center text-xs text-muted-foreground mt-2">Upload at least one document to submit</p>}
+        {hasAnyFile && hasBlockedDoc && <p className="text-center text-xs text-destructive mt-2">Please replace the document flagged as the wrong type.</p>}
+        {hasAnyFile && !hasBlockedDoc && hasUnconfirmedDoc && <p className="text-center text-xs text-amber-600 dark:text-amber-400 mt-2">Please confirm the flagged document above before submitting.</p>}
       </div>
     </div>
   );
