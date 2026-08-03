@@ -12,13 +12,16 @@ export default function SubscriptionGate() {
     );
   }
 
+  // No account set up yet — send them to settings to create one
   if (!account) {
     return <Navigate to="/settings" replace />;
   }
 
-  if (account.subscription_status === 'lapsed') {
-    return <Navigate to="/paywall" replace />;
+  // Trial or paid subscribers get straight through to the dashboard
+  if (account.subscription_status === 'trial_active' || account.subscription_status === 'active') {
+    return <Outlet />;
   }
 
-  return <Outlet />;
+  // Anything else (lapsed) is blocked
+  return <Navigate to="/paywall" replace />;
 }

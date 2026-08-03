@@ -5,11 +5,15 @@ import { useAuth } from '@/lib/AuthContext';
 const AccountContext = createContext(null);
 
 export function AccountProvider({ children }) {
-  const { user } = useAuth();
+  const { user, isLoadingAuth } = useAuth();
   const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const fetchAccount = useCallback(async () => {
+    if (isLoadingAuth) {
+      setLoading(true);
+      return;
+    }
     if (!user) {
       setAccount(null);
       setLoading(false);
@@ -22,7 +26,7 @@ export function AccountProvider({ children }) {
       setAccount(null);
     }
     setLoading(false);
-  }, [user]);
+  }, [user, isLoadingAuth]);
 
   useEffect(() => {
     setLoading(true);
