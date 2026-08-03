@@ -13,6 +13,7 @@ export default async function (req) {
 
     const expected = DOC_TYPES.includes(expected_type) ? expected_type : null;
 
+    try {
     const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: `You are a compliance document analyser for UK scaffolding compliance. Examine the uploaded document (image or PDF) and classify it, judge its legibility, and extract its key dates.
 
@@ -62,6 +63,18 @@ Rules:
       expiry_date: result?.expiry_date ?? null,
       issues: Array.isArray(result?.issues) ? result.issues : [],
     });
+    } catch (analysisError) {
+      console.error('Document analysis failed (unreadable or rejected file):', analysisError);
+      return Response.json({
+        detected_type: null,
+        matches_expected: null,
+        legible: false,
+        confidence: 0,
+        issue_date: null,
+        expiry_date: null,
+        issues: ['Could not analyse this file automatically — it may be empty, corrupted, or not a readable PDF or image. Please check the file and try again, or upload anyway if you are sure it is correct.'],
+      });
+    }
   } catch (error) {
     console.error('Document analysis error:', error);
     return Response.json({ error: error.message }, { status: 500 });
