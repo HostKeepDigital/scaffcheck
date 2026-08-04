@@ -9,7 +9,7 @@ import { REQUIRED_DOC_TYPES } from '@/lib/compliance';
 import { classifyVerdict } from '@/lib/docVerdict';
 import DocVerdictNotice from '@/components/DocVerdictNotice';
 
-const emptyDoc = { file: null, fileUrl: '', fileName: '', issueDate: '', expiryDate: '', aiIssue: false, aiExpiry: false, uploading: false, extracting: false, verdict: null, overrideConfirmed: false };
+const emptyDoc = { file: null, fileUri: '', fileName: '', issueDate: '', expiryDate: '', aiIssue: false, aiExpiry: false, uploading: false, extracting: false, verdict: null, overrideConfirmed: false };
 
 export default function OperativeUpload() {
   const { token } = useParams();
@@ -56,11 +56,11 @@ export default function OperativeUpload() {
     if (!file) return;
     updateDoc(type, { ...emptyDoc, uploading: true });
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      updateDoc(type, { fileUrl: file_url, fileName: file.name, uploading: false, extracting: true });
+      const { file_uri } = await base44.integrations.Core.UploadPrivateFile({ file });
+      updateDoc(type, { fileUri: file_uri, fileName: file.name, uploading: false, extracting: true });
       let result = null;
       try {
-        const response = await base44.functions.invoke('extractDocumentDates', { file_url, expected_type: type });
+        const response = await base44.functions.invoke('extractDocumentDates', { file_uri, expected_type: type });
         result = response.data;
       } catch (analysisError) {
         console.error('Document analysis failed:', analysisError);
@@ -83,10 +83,10 @@ export default function OperativeUpload() {
     setSubmitting(true);
     try {
       const documents = REQUIRED_DOC_TYPES
-        .filter((t) => docs[t].fileUrl && isDocReady(docs[t]))
+        .filter((t) => docs[t].fileUri && isDocReady(docs[t]))
         .map((t) => ({
           document_type: t,
-          file_url: docs[t].fileUrl,
+          file_uri: docs[t].fileUri,
           issue_date: docs[t].issueDate || null,
           expiry_date: docs[t].expiryDate || null,
         }));
@@ -138,9 +138,9 @@ export default function OperativeUpload() {
     );
   }
 
-  const hasAnyFile = Object.values(docs).some((d) => d.fileUrl);
-  const hasBlockedDoc = Object.values(docs).some((d) => d.fileUrl && d.verdict?.outcome === 'block');
-  const hasUnconfirmedDoc = Object.values(docs).some((d) => d.fileUrl && d.verdict?.outcome === 'warn' && !d.overrideConfirmed);
+  const hasAnyFile = Object.values(docs).some((d) => d.fileUri);
+  const hasBlockedDoc = Object.values(docs).some((d) => d.fileUri && d.verdict?.outcome === 'block');
+  const hasUnconfirmedDoc = Object.values(docs).some((d) => d.fileUri && d.verdict?.outcome === 'warn' && !d.overrideConfirmed);
   const canSubmit = hasAnyFile && !hasBlockedDoc && !hasUnconfirmedDoc;
 
   return (
@@ -167,7 +167,7 @@ export default function OperativeUpload() {
                   <span className="font-medium text-sm">{type}</span>
                 </div>
 
-                {!d.fileUrl ? (
+                {!d.fileUri ? (
                   <label className="block">
                     <div className="border-2 border-dashed border-border rounded-lg p-4 text-center cursor-pointer hover:border-amber-500 transition">
                       {d.uploading || d.extracting ? (

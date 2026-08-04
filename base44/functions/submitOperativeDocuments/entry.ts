@@ -32,12 +32,12 @@ Deno.serve(async (req) => {
     // Create compliance document records
     const uploadedTypes = [];
     for (const doc of documents) {
-      if (!doc.document_type || !doc.file_url) continue;
+      if (!doc.document_type || !doc.file_uri) continue;
       await base44.asServiceRole.entities.ComplianceDocument.create({
         account_id: invite.account_id,
         operative_id: invite.operative_id,
         document_type: doc.document_type,
-        file_url: doc.file_url,
+        file_uri: doc.file_uri,
         issue_date: doc.issue_date || null,
         expiry_date: doc.expiry_date || null,
         uploaded_at: new Date().toISOString(),

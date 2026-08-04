@@ -11,7 +11,7 @@ import DocVerdictNotice from '@/components/DocVerdictNotice';
 
 export default function DocumentForm({ open, onClose, operativeId, accountId, onSaved, onCreate }) {
   const [docType, setDocType] = useState('');
-  const [fileUrl, setFileUrl] = useState('');
+  const [fileUri, setFileUri] = useState('');
   const [fileName, setFileName] = useState('');
   const [issueDate, setIssueDate] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
@@ -25,7 +25,7 @@ export default function DocumentForm({ open, onClose, operativeId, accountId, on
   const [overrideConfirmed, setOverrideConfirmed] = useState(false);
 
   const resetForm = () => {
-    setDocType(''); setFileUrl(''); setFileName(''); setIssueDate(''); setExpiryDate('');
+    setDocType(''); setFileUri(''); setFileName(''); setIssueDate(''); setExpiryDate('');
     setAiIssue(false); setAiExpiry(false); setError('');
     setVerdict(null); setOverrideConfirmed(false);
   };
@@ -40,17 +40,17 @@ export default function DocumentForm({ open, onClose, operativeId, accountId, on
     if (!file) return;
     setError('');
     setUploading(true);
-    setFileUrl(''); setFileName(''); setIssueDate(''); setExpiryDate('');
+    setFileUri(''); setFileName(''); setIssueDate(''); setExpiryDate('');
     setAiIssue(false); setAiExpiry(false);
     setVerdict(null); setOverrideConfirmed(false);
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      setFileUrl(file_url);
+      const { file_uri } = await base44.integrations.Core.UploadPrivateFile({ file });
+      setFileUri(file_uri);
       setFileName(file.name);
       setExtracting(true);
       let result = null;
       try {
-        const response = await base44.functions.invoke('extractDocumentDates', { file_url, expected_type: docType || undefined });
+        const response = await base44.functions.invoke('extractDocumentDates', { file_uri, expected_type: docType || undefined });
         result = response.data;
       } catch (analysisError) {
         console.error('Document analysis failed:', analysisError);
@@ -75,7 +75,7 @@ export default function DocumentForm({ open, onClose, operativeId, accountId, on
     e.preventDefault();
     setError('');
     if (!docType) { setError('Please select a document type'); return; }
-    if (!fileUrl) { setError('Please upload a file'); return; }
+    if (!fileUri) { setError('Please upload a file'); return; }
     if (!expiryDate) { setError('Expiry date is required'); return; }
     if (verdict?.outcome === 'block') { setError(verdict.message); return; }
     if (verdict?.outcome === 'warn' && !overrideConfirmed) {
@@ -88,7 +88,7 @@ export default function DocumentForm({ open, onClose, operativeId, accountId, on
         account_id: accountId,
         operative_id: operativeId,
         document_type: docType,
-        file_url: fileUrl,
+        file_uri: fileUri,
         issue_date: issueDate || null,
         expiry_date: expiryDate,
         uploaded_at: new Date().toISOString(),
@@ -123,10 +123,10 @@ export default function DocumentForm({ open, onClose, operativeId, accountId, on
           <div className="space-y-1.5">
             <Label>Document file *</Label>
             <div className="border-2 border-dashed border-border rounded-lg p-4 text-center">
-              {fileUrl ? (
+              {fileUri ? (
                 <div className="flex items-center justify-center gap-2 text-sm text-green-600 dark:text-green-400">
                   <Check className="w-4 h-4" /> <span className="truncate max-w-[200px]">{fileName}</span>
-                  <Button type="button" variant="ghost" size="sm" className="ml-2 text-xs" onClick={() => { setFileUrl(''); setFileName(''); }}>
+                  <Button type="button" variant="ghost" size="sm" className="ml-2 text-xs" onClick={() => { setFileUri(''); setFileName(''); }}>
                     Change
                   </Button>
                 </div>
