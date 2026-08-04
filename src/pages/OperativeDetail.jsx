@@ -10,7 +10,8 @@ import OperativeForm from '@/components/OperativeForm';
 import DocumentForm from '@/components/DocumentForm';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Plus, FileDown, Mail, Pencil, Trash2, Loader2, ChevronLeft, History, ExternalLink, Trash } from 'lucide-react';
+import { Plus, FileDown, Mail, Pencil, Trash2, Loader2, ChevronLeft, History, Trash } from 'lucide-react';
+import ViewDocumentLink from '@/components/ViewDocumentLink';
 import { getOperativeCompliance, formatDate, REQUIRED_DOC_TYPES, getCurrentDocuments } from '@/lib/compliance';
 import { generateSingleOperativeReport } from '@/lib/pdfReport';
 
@@ -226,9 +227,7 @@ export default function OperativeDetail() {
                       <div className="mt-1.5 text-xs text-muted-foreground flex items-center gap-3">
                         <span>Expires: {formatDate(currentDoc.expiry_date)}</span>
                         {currentDoc.issue_date && <span>Issued: {formatDate(currentDoc.issue_date)}</span>}
-                        <a href={currentDoc.file_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-0.5">
-                          <ExternalLink className="w-3 h-3" /> View
-                        </a>
+                        <ViewDocumentLink documentId={currentDoc.id} />
                       </div>
                     ) : (
                       <p className="mt-1 text-xs text-muted-foreground/70">No document uploaded</p>
@@ -252,7 +251,7 @@ export default function OperativeDetail() {
                             {i === 0 ? 'Current' : `v${versions.length - i}`}
                           </span>
                           <span className="text-muted-foreground">Expires {formatDate(v.expiry_date)}</span>
-                          <a href={v.file_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">View</a>
+                          <ViewDocumentLink documentId={v.id} showIcon={false} />
                         </div>
                         <Button size="sm" variant="ghost" className="h-6 text-destructive" onClick={() => setDeleteDocId(v.id)}>
                           <Trash className="w-3 h-3" />
