@@ -11,11 +11,11 @@ export default async function (req) {
     const { file_uri, expected_type } = await req.json();
     if (!file_uri) return Response.json({ error: 'Missing file_uri' }, { status: 400 });
 
-    const { signed_url } = await base44.asServiceRole.integrations.Core.CreateFileSignedUrl({ file_uri, expires_in: 300 });
-
     const expected = DOC_TYPES.includes(expected_type) ? expected_type : null;
 
     try {
+    const { signed_url } = await base44.asServiceRole.integrations.Core.CreateFileSignedUrl({ file_uri, expires_in: 300 });
+
     const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: `You are a compliance document analyser for UK scaffolding compliance. Examine the uploaded document (image or PDF) and classify it, judge its legibility, and extract its key dates.
 
