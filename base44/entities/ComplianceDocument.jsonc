@@ -20,6 +20,9 @@
     "file_url": {
       "type": "string"
     },
+    "file_uri": {
+      "type": "string"
+    },
     "issue_date": {
       "type": "string",
       "format": "date"
@@ -36,8 +39,7 @@
   "required": [
     "account_id",
     "operative_id",
-    "document_type",
-    "file_url"
+    "document_type"
   ],
   "rls": {
     "create": {
