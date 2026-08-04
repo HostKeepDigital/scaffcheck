@@ -42,6 +42,7 @@ export function generateComplianceReport(companyName, operatives, documentsByOpe
   doc.text(`Operatives: ${operatives.length}`, margin, y);
   y += 8;
 
+  let opIndex = 0;
   for (const op of operatives) {
     const docs = documentsByOperative[op.id] || [];
     const { rag, documentStatuses } = getOperativeCompliance(docs);
@@ -52,7 +53,17 @@ export function generateComplianceReport(companyName, operatives, documentsByOpe
       y = margin;
     }
 
+    // Divider line between operatives (not before the first)
+    if (opIndex > 0) {
+      doc.setDrawColor(210, 210, 210);
+      doc.setLineWidth(0.2);
+      doc.line(margin, y, pageWidth - margin, y);
+      y += 8;
+    }
+    opIndex++;
+
     // Operative header
+    doc.setTextColor(15, 23, 42);   // reset to dark: fixes names after the first rendering white/invisible
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.text(op.full_name, margin, y);
