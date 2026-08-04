@@ -8,14 +8,10 @@ export default async function (req) {
     const user = await base44.auth.me();
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { file_url, file_uri, expected_type } = await req.json();
-    if (!file_url && !file_uri) return Response.json({ error: 'Missing file_uri' }, { status: 400 });
+    const { file_uri, expected_type } = await req.json();
+    if (!file_uri) return Response.json({ error: 'Missing file_uri' }, { status: 400 });
 
-    let readableUrl = file_url;
-    if (!readableUrl) {
-      const signed = await base44.asServiceRole.integrations.Core.CreateFileSignedUrl({ file_uri, expires_in: 600 });
-      readableUrl = signed.signed_url;
-    }
+    const { signed_url } = await base44.asServiceRole.integrations.Core.CreateFileSignedUrl({ file_uri, expires_in: 300 });
 
     const expected = DOC_TYPES.includes(expected_type) ? expected_type : null;
 
@@ -44,7 +40,7 @@ Rules:
 - Only extract dates clearly visible on the document. Do NOT guess or invent dates.
 - For a card, the expiry is typically the "Valid Until" or "Expiry" date. For insurance, use the policy expiry / valid-to date. For RAMS, use review/expiry dates.
 - Return null for any date you cannot find with reasonable confidence.`,
-      file_urls: [readableUrl],
+      file_urls: [signed_url],
       response_json_schema: {
         type: 'object',
         properties: {
