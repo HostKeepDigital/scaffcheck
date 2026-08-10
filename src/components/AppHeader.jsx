@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { HardHat, LogOut, LayoutDashboard, Settings } from 'lucide-react';
@@ -8,8 +9,8 @@ export default function AppHeader({ showNav = true }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout(false);
-    navigate('/');
+    // Clears the token and sends the user to the public home page
+    base44.auth.logout('/');
   };
 
   return (
