@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { HardHat } from 'lucide-react';
-import { SALES_EMAIL } from '@/lib/contact';
 
 const CHECKLIST = [
   'Track CISRS cards',
@@ -239,17 +238,7 @@ export default function About() {
           Your company's data is isolated from other customers, documents are stored in private storage, and files are
           only made accessible through <strong className="text-foreground">short-lived, secure links</strong>.
         </p>
-        <p className="mt-3 font-semibold text-foreground">Less paperwork. Less chasing. Fewer surprises.</p>
-        <p className="mt-1 font-semibold text-foreground">
-          ScaffKeep — know who's compliant before someone asks.
-        </p>
-        <p className="mt-3">
-          Larger workforces are handled on a custom plan — just{' '}
-          <Link to="/contact" className="underline text-foreground">get in touch</Link> or email{' '}
-          <a href={`mailto:${SALES_EMAIL}`} className="underline text-foreground">{SALES_EMAIL}</a>.
-        </p>
 
-        <p className="mt-6 text-sm italic">Built and maintained in the UK by Keep Technologies Ltd.</p>
       </main>
 
       <footer className="border-t border-border py-8">
