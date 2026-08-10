@@ -15,6 +15,7 @@ import { Link } from 'react-router-dom';
 import { getOperativeCompliance } from '@/lib/compliance';
 import { generateComplianceReport } from '@/lib/pdfReport';
 import PullToRefresh from '@/components/PullToRefresh';
+import OperativeListToolbar from '@/components/OperativeListToolbar';
 
 export default function Dashboard() {
   const { account } = useAccount();
@@ -23,6 +24,8 @@ export default function Dashboard() {
   const [showForm, setShowForm] = useState(false);
   const [reporting, setReporting] = useState(false);
   const [showImport, setShowImport] = useState(false);
+  const [statusFilter, setStatusFilter] = useState(null);
+  const [search, setSearch] = useState('');
 
   const { data, isLoading: loading, refetch } = useQuery({
     queryKey: ['dashboard', account?.id],
@@ -86,6 +89,18 @@ export default function Dashboard() {
 
   const ragOrder = { red: 0, amber: 1, green: 2 };
   operativesWithRag.sort((a, b) => ragOrder[a.rag] - ragOrder[b.rag] || a.full_name.localeCompare(b.full_name));
+
+  const term = search.trim().toLowerCase();
+  const filtersActive = !!term || !!statusFilter;
+  const visibleOperatives = operativesWithRag.filter((op) => {
+    if (statusFilter && op.rag !== statusFilter) return false;
+    if (!term) return true;
+    return (
+      (op.full_name || '').toLowerCase().includes(term) ||
+      (op.company_name || '').toLowerCase().includes(term)
+    );
+  });
+  const clearFilters = () => { setSearch(''); setStatusFilter(null); };
 
   const limit = planLimit(account?.plan);
   const atLimit = limit !== null && operatives.length >= limit;
@@ -156,22 +171,43 @@ export default function Dashboard() {
         ) : (
           <>
             <div className="mb-6">
-              <SummaryBar operatives={operatives} documentsByOperative={docsByOperative} />
+              <SummaryBar
+                operatives={operatives}
+                documentsByOperative={docsByOperative}
+                activeFilter={statusFilter}
+                onFilterChange={setStatusFilter}
+              />
             </div>
 
+            <OperativeListToolbar
+              search={search}
+              onSearchChange={setSearch}
+              shown={visibleOperatives.length}
+              total={operativesWithRag.length}
+              filtersActive={filtersActive}
+              onClear={clearFilters}
+            />
+
+            {visibleOperatives.length === 0 ? (
+              <div className="text-center py-16">
+                <p className="text-muted-foreground mb-4">No operatives match your filters</p>
+                <Button variant="outline" onClick={clearFilters}>Clear filters</Button>
+              </div>
+            ) : (
+            <>
             {/* Desktop table */}
             <div className="hidden sm:block bg-card rounded-xl border border-border overflow-hidden">
               <table className="w-full">
-                <thead>
-                  <tr className="border-b border-border bg-muted/50">
+                <thead className="sticky top-14 z-10">
+                  <tr className="border-b border-border bg-muted">
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Name</th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Company</th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Status</th>
-                    <th className="w-10"></th>
+                    <th className="w-10 bg-muted"></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {operativesWithRag.map((op) => (
+                  {visibleOperatives.map((op) => (
                     <tr key={op.id} className="border-b border-border hover:bg-muted/50 cursor-pointer"
                       onClick={() => navigate(`/operative/${op.id}`)}>
                       <td className="px-4 py-3 font-medium text-foreground">{op.full_name}</td>
@@ -186,19 +222,23 @@ export default function Dashboard() {
 
             {/* Mobile cards */}
             <div className="sm:hidden space-y-3">
-              {operativesWithRag.map((op) => (
+              {visibleOperatives.map((op) => (
                 <div key={op.id} className="bg-card rounded-xl border border-border p-4 cursor-pointer active:bg-muted/50"
                   onClick={() => navigate(`/operative/${op.id}`)}>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-foreground">{op.full_name}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{op.company_name || 'No company'}</p>
+                  <div className="flex items-center justify-between gap-3 min-h-[44px]">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-foreground truncate">{op.full_name}</p>
+                      {op.company_name && (
+                        <p className="text-xs text-muted-foreground mt-0.5 truncate">{op.company_name}</p>
+                      )}
                     </div>
                     <RAGBadge rag={op.rag} />
                   </div>
                 </div>
               ))}
             </div>
+            </>
+            )}
           </>
         )}
       </div>
