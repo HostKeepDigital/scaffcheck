@@ -175,7 +175,7 @@ export default function Dashboard() {
                 operatives={operatives}
                 documentsByOperative={docsByOperative}
                 activeFilter={statusFilter}
-                onFilterChange={(rag) => { setStatusFilter(rag); setSearch(''); }}
+                onFilterChange={setStatusFilter}
               />
             </div>
 
@@ -198,8 +198,8 @@ export default function Dashboard() {
             {/* Desktop table */}
             <div className="hidden sm:block bg-card rounded-xl border border-border overflow-hidden">
               <table className="w-full">
-                <thead>
-                  <tr className="border-b border-border bg-muted/50">
+                <thead className="sticky top-14 z-10">
+                  <tr className="border-b border-border bg-muted">
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Name</th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Company</th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Status</th>
