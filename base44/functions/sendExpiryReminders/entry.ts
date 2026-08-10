@@ -11,12 +11,6 @@ const REMINDER_THRESHOLDS = [30, 14, 7, 3, 1, 0];
 
 Deno.serve(async (req) => {
   try {
-    const authHeader = req.headers.get('authorization') || '';
-    const cronSecret = Deno.env.get('CRON_SECRET');
-    if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const base44 = createClientFromRequest(req);
 
     const today = new Date();
