@@ -8,7 +8,8 @@ import SummaryBar from '@/components/SummaryBar';
 import RAGBadge from '@/components/RAGBadge';
 import OperativeForm from '@/components/OperativeForm';
 import { Button } from '@/components/ui/button';
-import { Plus, FileDown, Loader2, ChevronRight, Lock } from 'lucide-react';
+import { Plus, FileDown, Loader2, ChevronRight, Lock, Upload } from 'lucide-react';
+import BulkImportDialog from '@/components/BulkImportDialog';
 import { planLimit } from '@/lib/stripePrices';
 import { Link } from 'react-router-dom';
 import { getOperativeCompliance } from '@/lib/compliance';
@@ -21,6 +22,7 @@ export default function Dashboard() {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [reporting, setReporting] = useState(false);
+  const [showImport, setShowImport] = useState(false);
 
   const { data, isLoading: loading, refetch } = useQuery({
     queryKey: ['dashboard', account?.id],
@@ -87,6 +89,7 @@ export default function Dashboard() {
 
   const limit = planLimit(account?.plan);
   const atLimit = limit !== null && operatives.length >= limit;
+  const remaining = limit === null ? null : Math.max(limit - operatives.length, 0);
 
   const handleReport = () => {
     setReporting(true);
@@ -111,6 +114,9 @@ export default function Dashboard() {
             <Button variant="outline" onClick={handleReport} disabled={reporting || operatives.length === 0}>
               {reporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileDown className="w-4 h-4 mr-2" />}
               Compliance Report
+            </Button>
+            <Button variant="outline" onClick={() => setShowImport(true)} disabled={atLimit}>
+              <Upload className="w-4 h-4 mr-2" /> Import CSV
             </Button>
             <Button onClick={() => setShowForm(true)} disabled={atLimit}
               className="bg-primary text-primary-foreground hover:bg-primary/90">
@@ -138,9 +144,14 @@ export default function Dashboard() {
         ) : operatives.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-muted-foreground mb-4">No operatives yet. Add your first one to get started.</p>
-            <Button onClick={() => setShowForm(true)} className="bg-primary text-primary-foreground hover:bg-primary/90">
-              <Plus className="w-4 h-4 mr-2" /> Add Operative
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-2 justify-center">
+              <Button onClick={() => setShowForm(true)} className="bg-primary text-primary-foreground hover:bg-primary/90">
+                <Plus className="w-4 h-4 mr-2" /> Add Operative
+              </Button>
+              <Button variant="outline" onClick={() => setShowImport(true)}>
+                <Upload className="w-4 h-4 mr-2" /> Import from CSV
+              </Button>
+            </div>
           </div>
         ) : (
           <>
@@ -199,6 +210,13 @@ export default function Dashboard() {
         accountId={account?.id}
         onSaved={loadData}
         onCreate={createOperativeMutation.mutateAsync}
+      />
+      <BulkImportDialog
+        open={showImport}
+        onClose={() => setShowImport(false)}
+        accountId={account?.id}
+        remaining={remaining}
+        onImported={loadData}
       />
     </div>
   );
