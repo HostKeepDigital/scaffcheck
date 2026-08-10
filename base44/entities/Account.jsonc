@@ -25,6 +25,10 @@
       "type": "string",
       "format": "date-time"
     },
+    "current_period_end": {
+      "type": "string",
+      "format": "date-time"
+    },
     "stripe_customer_id": {
       "type": "string"
     },

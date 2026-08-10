@@ -1,7 +1,8 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, CreditCard, Users, CalendarClock, Repeat, ArrowUpRight } from 'lucide-react';
+import { Loader2, CreditCard, CalendarClock, Repeat, ArrowUpRight, Receipt } from 'lucide-react';
 import { PLANS, planLimit, annualSaving } from '@/lib/stripePrices';
+import OperativeUsageBar from '@/components/OperativeUsageBar';
 
 const STATUS = {
   trial_active: { label: 'Trial active', cls: 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30' },
@@ -12,15 +13,15 @@ const STATUS = {
 const fmtDate = (d) =>
   new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
-export default function BillingCard({ account, onManage, busy }) {
+export default function BillingCard({ account, onManage, busy, ragCounts }) {
   const plan = PLANS.find((p) => p.id === account.plan) || PLANS[0];
   const billing = account.billing === 'annual' ? 'annual' : 'monthly';
   const status = STATUS[account.subscription_status] || STATUS.trial_active;
   const limit = planLimit(account.plan);
-  const used = account.operative_count || 0;
-  const pct = limit ? Math.min(100, Math.round((used / limit) * 100)) : 0;
-  const nearLimit = limit && used >= limit * 0.8;
   const isTrial = account.subscription_status === 'trial_active';
+  const renewalDate = isTrial ? account.trial_ends_at : account.current_period_end;
+  const renewalPrice = plan[billing].priceLabel;
+  const cycleWord = billing === 'annual' ? 'year' : 'month';
 
   return (
     <Card>
@@ -54,29 +55,7 @@ export default function BillingCard({ account, onManage, busy }) {
 
         {/* Usage */}
         <div className="p-5 border-b border-border">
-          <div className="flex items-center justify-between text-sm">
-            <span className="flex items-center gap-2 text-muted-foreground">
-              <Users className="w-4 h-4" /> Operatives tracked
-            </span>
-            <span className="font-semibold text-foreground">
-              {used}{limit ? ` of ${limit}` : ''}
-            </span>
-          </div>
-          {limit > 0 && (
-            <>
-              <div className="mt-2 h-2 w-full rounded-full bg-muted overflow-hidden">
-                <div
-                  className={`h-full rounded-full transition-all ${nearLimit ? 'bg-amber-500' : 'bg-green-500'}`}
-                  style={{ width: `${pct}%` }}
-                />
-              </div>
-              <p className="mt-2 text-xs text-muted-foreground">
-                {used >= limit
-                  ? "You've reached your plan limit — upgrade to add more operatives."
-                  : `${limit - used} more operative${limit - used === 1 ? '' : 's'} available on this plan.`}
-              </p>
-            </>
-          )}
+          <OperativeUsageBar limit={limit} ragCounts={ragCounts} />
         </div>
 
         {/* Billing details */}
@@ -92,20 +71,31 @@ export default function BillingCard({ account, onManage, busy }) {
               Switch to annual billing and save £{annualSaving(plan)} a year.
             </p>
           )}
-          {isTrial && account.trial_ends_at && (
+          {renewalDate && (
             <div className="flex items-start justify-between gap-4">
               <span className="flex items-center gap-2 text-muted-foreground">
-                <CalendarClock className="w-4 h-4" /> First payment
+                <CalendarClock className="w-4 h-4" /> {isTrial ? 'First payment due' : 'Next renewal due'}
               </span>
-              <span className="font-semibold text-foreground text-right">
-                {fmtDate(account.trial_ends_at)}
-              </span>
+              <span className="font-semibold text-foreground text-right">{fmtDate(renewalDate)}</span>
             </div>
           )}
+          <div className="flex items-start justify-between gap-4">
+            <span className="flex items-center gap-2 text-muted-foreground">
+              <Receipt className="w-4 h-4" /> {isTrial ? 'Amount at first payment' : 'Amount at renewal'}
+            </span>
+            <span className="font-semibold text-foreground text-right">
+              {renewalPrice} <span className="font-normal text-muted-foreground">per {cycleWord}</span>
+            </span>
+          </div>
           {isTrial && (
             <p className="text-xs text-muted-foreground">
-              Your free trial runs until then. You won't be charged before that date, and your subscription
-              starts automatically afterwards unless you cancel.
+              Your free trial runs until then. You won't be charged before that date, and your{' '}
+              {plan.name} subscription starts automatically afterwards unless you cancel.
+            </p>
+          )}
+          {!isTrial && !renewalDate && (
+            <p className="text-xs text-muted-foreground">
+              Your exact renewal date will appear here after your next billing update.
             </p>
           )}
           {account.subscription_status === 'lapsed' && (

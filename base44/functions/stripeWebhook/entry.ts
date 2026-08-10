@@ -77,7 +77,14 @@ Deno.serve(async (req) => {
             status = 'trial_active';
           }
           const updates: Record<string, string> = { subscription_status: status };
-          const currentPrice = subscription.items?.data?.[0]?.price?.id;
+          const item = subscription.items?.data?.[0];
+          // Newer Stripe API versions expose the period end on the subscription item
+          const periodEnd = item?.current_period_end ?? subscription.current_period_end;
+          if (periodEnd) updates.current_period_end = new Date(periodEnd * 1000).toISOString();
+          if (subscription.trial_end) {
+            updates.trial_ends_at = new Date(subscription.trial_end * 1000).toISOString();
+          }
+          const currentPrice = item?.price?.id;
           const matched = currentPrice ? planFromPriceId(currentPrice) : undefined;
           if (matched) {
             updates.plan = matched.plan;

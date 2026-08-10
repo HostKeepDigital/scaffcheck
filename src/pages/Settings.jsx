@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { getOperativeCompliance } from '@/lib/compliance';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { useAccount } from '@/lib/AccountContext';
@@ -36,6 +38,27 @@ export default function Settings() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [deleting, setDeleting] = useState(false);
+
+  // RAG breakdown of operatives, used by the billing usage bar
+  const { data: ragCounts } = useQuery({
+    queryKey: ['ragCounts', account?.id],
+    queryFn: async () => {
+      const [ops, docs] = await Promise.all([
+        base44.entities.Operative.filter({ account_id: account.id }),
+        base44.entities.ComplianceDocument.filter({ account_id: account.id }),
+      ]);
+      const byOperative = {};
+      for (const doc of docs || []) {
+        (byOperative[doc.operative_id] ||= []).push(doc);
+      }
+      const counts = { red: 0, amber: 0, green: 0 };
+      for (const op of ops || []) {
+        counts[getOperativeCompliance(byOperative[op.id] || []).rag] += 1;
+      }
+      return counts;
+    },
+    enabled: !!account?.id,
+  });
 
   const handleStartTrial = async () => {
     setError('');
@@ -195,7 +218,7 @@ export default function Settings() {
               </CardContent>
             </Card>
 
-            <BillingCard account={account} onManage={() => handleManageBilling()} busy={saving} />
+            <BillingCard account={account} onManage={() => handleManageBilling()} busy={saving} ragCounts={ragCounts} />
 
             <EnterpriseContactCard companyName={account.company_name} />
           </div>
