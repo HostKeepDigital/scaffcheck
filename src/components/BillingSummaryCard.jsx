@@ -13,14 +13,13 @@ const STATUS = {
 const fmtDate = (d) =>
   new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
-export default function BillingCard({ account, onManage, busy, ragCounts }) {
+export default function BillingSummaryCard({ account, onManage, busy, ragCounts }) {
   const plan = PLANS.find((p) => p.id === account.plan) || PLANS[0];
   const billing = account.billing === 'annual' ? 'annual' : 'monthly';
   const status = STATUS[account.subscription_status] || STATUS.trial_active;
   const limit = planLimit(account.plan);
   const isTrial = account.subscription_status === 'trial_active';
   const renewalDate = isTrial ? account.trial_ends_at : account.current_period_end;
-  const renewalPrice = plan[billing].priceLabel;
   const cycleWord = billing === 'annual' ? 'year' : 'month';
 
   return (
@@ -84,13 +83,14 @@ export default function BillingCard({ account, onManage, busy, ragCounts }) {
               <Receipt className="w-4 h-4" /> {isTrial ? 'Amount at first payment' : 'Amount at renewal'}
             </span>
             <span className="font-semibold text-foreground text-right">
-              {renewalPrice} <span className="font-normal text-muted-foreground">per {cycleWord}</span>
+              {plan[billing].priceLabel}{' '}
+              <span className="font-normal text-muted-foreground">per {cycleWord}</span>
             </span>
           </div>
           {isTrial && (
             <p className="text-xs text-muted-foreground">
-              Your free trial runs until then. You won't be charged before that date, and your{' '}
-              {plan.name} subscription starts automatically afterwards unless you cancel.
+              Your free trial runs until then. You won't be charged before that date, and your {plan.name}{' '}
+              subscription starts automatically afterwards unless you cancel.
             </p>
           )}
           {!isTrial && !renewalDate && (

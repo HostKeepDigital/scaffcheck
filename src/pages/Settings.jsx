@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Building2, CreditCard, Check, AlertCircle, Trash2 } from 'lucide-react';
 import { PLANS, annualSaving } from '@/lib/stripePrices';
 import BillingToggle from '@/components/BillingToggle';
-import BillingCard from '@/components/BillingCard';
+import BillingSummaryCard from '@/components/BillingSummaryCard';
 import EnterpriseContactCard from '@/components/EnterpriseContactCard';
 import { planLimit } from '@/lib/stripePrices';
 import {
@@ -218,7 +218,7 @@ export default function Settings() {
               </CardContent>
             </Card>
 
-            <BillingCard account={account} onManage={() => handleManageBilling()} busy={saving} ragCounts={ragCounts} />
+            <BillingSummaryCard account={account} onManage={() => handleManageBilling()} busy={saving} ragCounts={ragCounts} />
 
             <EnterpriseContactCard companyName={account.company_name} />
           </div>
