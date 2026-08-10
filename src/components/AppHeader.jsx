@@ -36,6 +36,8 @@ export default function AppHeader({ showNav = true }) {
                   <Settings className="w-4 h-4 sm:mr-1.5" />
                   <span>Settings</span>
                 </Button>
+                <Link to="/about" className="hidden sm:inline text-sm text-slate-300 hover:text-white px-2">About</Link>
+                <Link to="/contact" className="hidden sm:inline text-sm text-slate-300 hover:text-white px-2">Contact</Link>
                 <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white hover:bg-slate-700/50"
                   onClick={handleLogout}>
                   <LogOut className="w-4 h-4 sm:mr-1.5" />
