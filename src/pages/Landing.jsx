@@ -32,6 +32,8 @@ export default function Landing() {
             ScaffKeep
           </div>
           <div className="flex items-center gap-2">
+            <Link to="/about" className="hidden sm:inline text-sm text-slate-300 hover:text-white px-2">About</Link>
+            <Link to="/contact" className="hidden sm:inline text-sm text-slate-300 hover:text-white px-2 mr-1">Contact</Link>
             {isAuthenticated ? (
               <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white font-semibold" onClick={() => navigate('/dashboard')}>
                 Go to Dashboard
