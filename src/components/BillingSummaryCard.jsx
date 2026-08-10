@@ -114,19 +114,27 @@ export default function BillingSummaryCard({ account, onManage, busy, ragCounts 
             disabled={busy}
           >
             {busy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ArrowUpRight className="w-4 h-4 mr-2" />}
-            Manage subscription &amp; billing
+            {isTrial ? 'Manage billing & invoices' : <>Manage subscription &amp; billing</>}
           </Button>
-          <DowngradeLimitNotice operativeCount={account.operative_count || 0} />
-          <ul className="text-xs text-muted-foreground space-y-1">
-            <li>• Change plan (Crew, Contractor or Firm)</li>
-            <li>• Switch between monthly and annual billing</li>
-            <li>• Update your card or billing address</li>
-            <li>• Download invoices and receipts</li>
-            <li>• Cancel your subscription</li>
-          </ul>
-          <p className="text-xs text-muted-foreground">
-            Plan changes take effect straight away and any price difference is worked out for you automatically.
-          </p>
+          {isTrial ? (
+            <p className="text-xs text-muted-foreground">
+              You can change your plan once your trial ends — or contact us and we'll switch it for you.
+            </p>
+          ) : (
+            <>
+              <DowngradeLimitNotice operativeCount={account.operative_count || 0} />
+              <ul className="text-xs text-muted-foreground space-y-1">
+                <li>• Change plan (Crew, Contractor or Firm)</li>
+                <li>• Switch between monthly and annual billing</li>
+                <li>• Update your card or billing address</li>
+                <li>• Download invoices and receipts</li>
+                <li>• Cancel your subscription</li>
+              </ul>
+              <p className="text-xs text-muted-foreground">
+                Plan changes take effect straight away and any price difference is worked out for you automatically.
+              </p>
+            </>
+          )}
         </div>
       </CardContent>
     </Card>
