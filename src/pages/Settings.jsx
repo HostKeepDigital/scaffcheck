@@ -11,6 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Building2, CreditCard, Check, AlertCircle, Trash2 } from 'lucide-react';
 import { PLANS, annualSaving } from '@/lib/stripePrices';
 import BillingToggle from '@/components/BillingToggle';
+import EnterpriseContactCard from '@/components/EnterpriseContactCard';
+import { planLimit } from '@/lib/stripePrices';
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -169,6 +171,9 @@ export default function Settings() {
                 <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
                   <Check className="w-4 h-4 text-green-600 dark:text-green-400" /> 7-day free trial · Card required · Cancel anytime
                 </div>
+                <div className="mt-4">
+                  <EnterpriseContactCard companyName={companyName} />
+                </div>
                 <Button className="w-full mt-4 bg-amber-500 hover:bg-amber-600 text-white font-semibold h-11"
                   onClick={handleStartTrial} disabled={saving}>
                   {saving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Starting...</> : 'Start free trial'}
@@ -211,7 +216,9 @@ export default function Settings() {
                 )}
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Operatives tracked</span>
-                  <span className="font-medium">{account.operative_count}</span>
+                  <span className="font-medium">
+                    {account.operative_count}{planLimit(account.plan) ? ` of ${planLimit(account.plan)}` : ''}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Billed</span>
@@ -229,6 +236,8 @@ export default function Settings() {
                 </Button>
               </CardContent>
             </Card>
+
+            <EnterpriseContactCard companyName={account.company_name} />
           </div>
         )}
 

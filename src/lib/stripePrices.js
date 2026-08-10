@@ -28,6 +28,10 @@ export const PLANS = [
   },
 ];
 
+export function planLimit(planId) {
+  return PLANS.find((p) => p.id === planId)?.operativeLimit ?? null;
+}
+
 export function annualSaving(plan) {
   const monthlyForYear = plan.monthly.price * 12;
   const saving = monthlyForYear - plan.annual.price;

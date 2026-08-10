@@ -8,7 +8,9 @@ import SummaryBar from '@/components/SummaryBar';
 import RAGBadge from '@/components/RAGBadge';
 import OperativeForm from '@/components/OperativeForm';
 import { Button } from '@/components/ui/button';
-import { Plus, FileDown, Loader2, ChevronRight } from 'lucide-react';
+import { Plus, FileDown, Loader2, ChevronRight, Lock } from 'lucide-react';
+import { planLimit } from '@/lib/stripePrices';
+import { Link } from 'react-router-dom';
 import { getOperativeCompliance } from '@/lib/compliance';
 import { generateComplianceReport } from '@/lib/pdfReport';
 import PullToRefresh from '@/components/PullToRefresh';
@@ -83,6 +85,9 @@ export default function Dashboard() {
   const ragOrder = { red: 0, amber: 1, green: 2 };
   operativesWithRag.sort((a, b) => ragOrder[a.rag] - ragOrder[b.rag] || a.full_name.localeCompare(b.full_name));
 
+  const limit = planLimit(account?.plan);
+  const atLimit = limit !== null && operatives.length >= limit;
+
   const handleReport = () => {
     setReporting(true);
     try {
@@ -107,11 +112,24 @@ export default function Dashboard() {
               {reporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileDown className="w-4 h-4 mr-2" />}
               Compliance Report
             </Button>
-            <Button onClick={() => setShowForm(true)} className="bg-primary text-primary-foreground hover:bg-primary/90">
-              <Plus className="w-4 h-4 mr-2" /> Add Operative
+            <Button onClick={() => setShowForm(true)} disabled={atLimit}
+              className="bg-primary text-primary-foreground hover:bg-primary/90">
+              {atLimit ? <Lock className="w-4 h-4 mr-2" /> : <Plus className="w-4 h-4 mr-2" />} Add Operative
             </Button>
           </div>
         </div>
+
+        {atLimit && (
+          <div className="mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-sm">
+            <p className="font-semibold text-amber-700 dark:text-amber-400">
+              You've reached your plan limit of {limit} operatives
+            </p>
+            <p className="text-muted-foreground mt-1">
+              Upgrade your plan to add more, or{' '}
+              <Link to="/settings" className="underline font-medium">manage your subscription</Link>.
+            </p>
+          </div>
+        )}
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
