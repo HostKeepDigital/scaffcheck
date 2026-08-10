@@ -19,33 +19,90 @@ export default function About() {
       </header>
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-12">
-        <h1 className="text-3xl font-bold text-foreground">About ScaffKeep</h1>
+        <h1 className="text-3xl font-bold text-foreground">ScaffKeep</h1>
+        <p className="mt-2 text-lg font-semibold text-foreground">Compliance, without the paperwork chase.</p>
 
         <div className="mt-6 space-y-4 text-muted-foreground leading-relaxed">
           <p>
-            ScaffKeep is compliance record keeping built specifically for UK scaffolding contractors. It replaces
-            the folders, spreadsheets and glovebox paperwork that most yards still rely on with a single live
-            picture of who on your books is compliant and who is not. For every operative you track four things:
-            their CISRS card, public liability insurance, employers liability insurance and their RAMS. ScaffKeep
-            reads the dates off each document you upload, works out the status for you, and colours every
-            operative red, amber or green — red for anything missing or expired, amber for anything expiring soon,
-            green when the full set is valid.
+            ScaffKeep is compliance record keeping built specifically for{' '}
+            <strong className="text-foreground">UK scaffolding contractors</strong>.
           </p>
           <p>
-            It is made for the people who get asked for evidence at short notice: scaffolding contractors,
-            labour-only subcontractors, site managers and the office staff who chase paperwork on their behalf.
-            When a principal contractor asks for proof, you export a dated compliance report for your whole
-            workforce in a couple of taps instead of digging through emails. Operatives can be sent a secure
-            upload link so they submit their own cards and certificates straight from a phone, without ever
-            being able to see anyone else's records. Expiry reminders land before a card lapses, not after,
-            so a shutdown never comes as a surprise.
+            It replaces the folders, spreadsheets, emails and glovebox paperwork that many yards still rely on with{' '}
+            <strong className="text-foreground">one live view of your workforce compliance</strong>.
+          </p>
+          <p>For every operative, ScaffKeep tracks four essential records:</p>
+          <ul className="list-disc pl-6 space-y-1">
+            <li><strong className="text-foreground">CISRS card</strong></li>
+            <li><strong className="text-foreground">Public Liability Insurance</strong></li>
+            <li><strong className="text-foreground">Employers’ Liability Insurance</strong></li>
+            <li><strong className="text-foreground">RAMS</strong></li>
+          </ul>
+          <p>
+            Upload a document and ScaffKeep reads the relevant dates, works out the current status and keeps
+            everything up to date automatically. Every operative is clearly marked{' '}
+            <strong className="text-foreground">red, amber or green</strong> — red if something is missing or
+            expired, amber if it is approaching expiry, and green when everything is valid.
+          </p>
+
+          <h2 className="text-xl font-semibold text-foreground pt-4">Know who is compliant at a glance.</h2>
+          <p>
+            No more searching through folders. No more checking spreadsheets against emails. No more wondering
+            whether a certificate is still valid.
           </p>
           <p>
-            ScaffKeep is built and maintained by Keep Technologies Ltd, a small UK software company focused on
-            practical compliance tools for the construction trades. Every account's data is isolated to that
-            company, documents are held in private storage, and files are only ever served through short-lived
-            secure links. Plans scale from small crews to firms tracking dozens of operatives, and larger
-            workforces are handled on a custom plan — just{' '}
+            ScaffKeep gives contractors, site managers and office teams a{' '}
+            <strong className="text-foreground">single, live picture of their compliance position</strong>.
+          </p>
+          <p>
+            When a principal contractor asks for evidence, generate a{' '}
+            <strong className="text-foreground">dated compliance report for your workforce in just a few taps</strong>.
+          </p>
+
+          <h2 className="text-xl font-semibold text-foreground pt-4">Let operatives upload their own documents.</h2>
+          <p>
+            Send an operative a secure upload link and they can submit their CISRS card, insurance documents and
+            other records directly from their phone.
+          </p>
+          <p>
+            They only have access to their own upload area —{' '}
+            <strong className="text-foreground">never another operative's records</strong>.
+          </p>
+          <p>That means less paperwork for the office and less time spent chasing people for documents.</p>
+
+          <h2 className="text-xl font-semibold text-foreground pt-4">Stay ahead of expiries.</h2>
+          <p>ScaffKeep monitors expiry dates and sends reminders before important documents lapse.</p>
+          <p>
+            Instead of finding out that a card or certificate has expired when you're asked for it on site, you can
+            deal with it <strong className="text-foreground">before it becomes a problem</strong>.
+          </p>
+
+          <h2 className="text-xl font-semibold text-foreground pt-4">Built for scaffolding contractors.</h2>
+          <p>
+            ScaffKeep is designed around the way UK scaffolding businesses actually work — from small local crews
+            and labour-only subcontractors to larger contractors managing dozens of operatives.
+          </p>
+          <p>
+            Plans scale with your workforce, with{' '}
+            <strong className="text-foreground">custom options available for larger teams</strong>.
+          </p>
+
+          <h2 className="text-xl font-semibold text-foreground pt-4">Built by Keep Technologies Ltd</h2>
+          <p>
+            ScaffKeep is built and maintained by{' '}
+            <strong className="text-foreground">Keep Technologies Ltd</strong>, a UK software company focused on
+            creating practical compliance tools for the construction trades.
+          </p>
+          <p>
+            Your company's data is isolated from other customers, documents are stored in private storage, and files
+            are only made accessible through{' '}
+            <strong className="text-foreground">short-lived, secure links</strong>.
+          </p>
+          <p className="font-semibold text-foreground pt-2">Less paperwork. Less chasing. Fewer surprises.</p>
+          <p className="font-semibold text-foreground">ScaffKeep — know who's compliant before someone asks.</p>
+
+          <p>
+            Larger workforces are handled on a custom plan — just{' '}
             <Link to="/contact" className="underline text-foreground">get in touch</Link> or email{' '}
             <a href={`mailto:${SALES_EMAIL}`} className="underline text-foreground">{SALES_EMAIL}</a>.
           </p>
