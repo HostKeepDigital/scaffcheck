@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, CreditCard, CalendarClock, Repeat, ArrowUpRight, Receipt } from 'lucide-react';
 import { PLANS, planLimit, annualSaving } from '@/lib/stripePrices';
 import OperativeUsageBar from '@/components/OperativeUsageBar';
+import DowngradeLimitNotice from '@/components/DowngradeLimitNotice';
 
 const STATUS = {
   trial_active: { label: 'Trial active', cls: 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30' },
@@ -115,6 +116,7 @@ export default function BillingSummaryCard({ account, onManage, busy, ragCounts 
             {busy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ArrowUpRight className="w-4 h-4 mr-2" />}
             Manage subscription &amp; billing
           </Button>
+          <DowngradeLimitNotice operativeCount={account.operative_count || 0} />
           <ul className="text-xs text-muted-foreground space-y-1">
             <li>• Change plan (Crew, Contractor or Firm)</li>
             <li>• Switch between monthly and annual billing</li>
