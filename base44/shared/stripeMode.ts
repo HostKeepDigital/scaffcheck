@@ -1,11 +1,11 @@
 // Single switch for the whole Stripe integration.
 // true  = TEST mode (no real money, use card 4242 4242 4242 4242)
 // false = LIVE mode (real charges)
-export const USE_TEST_MODE = false;
+export const USE_TEST_MODE = true;
 
 export function stripeSecretKey(): string {
   return USE_TEST_MODE
-    ? Deno.env.get('STRIPE_TEST_MODE_SECRET_KEY')!
+    ? Deno.env.get('STRIPE_TEST_SECRET_KEY')!
     : Deno.env.get('STRIPE_SECRET_KEY')!;
 }
 
