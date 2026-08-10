@@ -19,10 +19,24 @@ Deno.serve(async (req) => {
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
     const origin = req.headers.get('origin') || 'https://app.base44.com';
 
-    const session = await stripe.billingPortal.sessions.create({
+    let body = {};
+    try { body = await req.json(); } catch (_e) { body = {}; }
+
+    const params = {
       customer: account.stripe_customer_id,
       return_url: `${origin}/settings`,
-    });
+    };
+
+    // Deep-link straight to the "change plan" screen when requested
+    if (body?.flow === 'change_plan' && account.stripe_subscription_id) {
+      params.flow_data = {
+        type: 'subscription_update',
+        subscription_update: { subscription: account.stripe_subscription_id },
+        after_completion: { type: 'redirect', redirect: { return_url: `${origin}/settings` } },
+      };
+    }
+
+    const session = await stripe.billingPortal.sessions.create(params);
 
     return Response.json({ url: session.url });
   } catch (error) {

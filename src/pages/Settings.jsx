@@ -75,7 +75,7 @@ export default function Settings() {
     }
   };
 
-  const handleManageBilling = async () => {
+  const handleManageBilling = async (flow) => {
     setError('');
     if (window.self !== window.top) {
       setError('Billing portal works only from a published app. Please publish your app to manage billing.');
@@ -83,7 +83,7 @@ export default function Settings() {
     }
     setSaving(true);
     try {
-      const response = await base44.functions.invoke('stripePortal', { user_id: user.id });
+      const response = await base44.functions.invoke('stripePortal', { user_id: user.id, flow });
       if (response.data?.url) {
         window.location.href = response.data.url;
       }
@@ -213,8 +213,19 @@ export default function Settings() {
                   <span className="text-muted-foreground">Operatives tracked</span>
                   <span className="font-medium">{account.operative_count}</span>
                 </div>
-                <Button variant="outline" className="w-full" onClick={handleManageBilling} disabled={saving}>
-                  {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : 'Manage Billing'}
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Billed</span>
+                  <span className="font-medium capitalize">{account.billing || 'monthly'}</span>
+                </div>
+                <Button className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold"
+                  onClick={() => handleManageBilling('change_plan')} disabled={saving}>
+                  {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : 'Change plan or billing frequency'}
+                </Button>
+                <p className="text-xs text-muted-foreground text-center">
+                  Switch between Crew, Contractor and Firm, or move between monthly and annual. Any difference is worked out for you automatically.
+                </p>
+                <Button variant="outline" className="w-full" onClick={() => handleManageBilling()} disabled={saving}>
+                  {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : 'Manage billing & invoices'}
                 </Button>
               </CardContent>
             </Card>
