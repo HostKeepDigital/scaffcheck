@@ -1,7 +1,7 @@
 // Single switch for the whole Stripe integration.
 // true  = TEST mode (no real money, use card 4242 4242 4242 4242)
 // false = LIVE mode (real charges)
-export const USE_TEST_MODE = true;
+export const USE_TEST_MODE = false;
 
 export function stripeSecretKey(): string {
   return USE_TEST_MODE
