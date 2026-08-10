@@ -1,6 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 import Stripe from 'npm:stripe@18.3.0';
-import { stripeSecretKey, stripeWebhookSecret } from '../../shared/stripeMode.ts';
+import { stripeSecretKey, stripeWebhookSecret, planFromPriceId } from '../../shared/stripeMode.ts';
 
 Deno.serve(async (req) => {
   try {
@@ -76,9 +76,14 @@ Deno.serve(async (req) => {
           } else if (subscription.status === 'trialing') {
             status = 'trial_active';
           }
-          await base44.asServiceRole.entities.Account.update(accounts[0].id, {
-            subscription_status: status,
-          });
+          const updates: Record<string, string> = { subscription_status: status };
+          const currentPrice = subscription.items?.data?.[0]?.price?.id;
+          const matched = currentPrice ? planFromPriceId(currentPrice) : undefined;
+          if (matched) {
+            updates.plan = matched.plan;
+            updates.billing = matched.billing;
+          }
+          await base44.asServiceRole.entities.Account.update(accounts[0].id, updates);
         }
         break;
       }

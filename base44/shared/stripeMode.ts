@@ -31,3 +31,14 @@ export function priceId(plan: string, billing: string): string | undefined {
   const prices = USE_TEST_MODE ? TEST_PRICES : LIVE_PRICES;
   return prices[plan]?.[billing === 'annual' ? 'annual' : 'monthly'];
 }
+
+// Reverse lookup: which plan/billing does a Stripe price belong to?
+export function planFromPriceId(id: string): { plan: string; billing: string } | undefined {
+  for (const prices of [TEST_PRICES, LIVE_PRICES]) {
+    for (const [plan, cycles] of Object.entries(prices)) {
+      if (cycles.monthly === id) return { plan, billing: 'monthly' };
+      if (cycles.annual === id) return { plan, billing: 'annual' };
+    }
+  }
+  return undefined;
+}
