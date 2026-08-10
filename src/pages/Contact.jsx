@@ -1,22 +1,12 @@
 import { Link } from 'react-router-dom';
-import { HardHat, Mail, Building2, Clock } from 'lucide-react';
+import { Mail, Building2, Clock } from 'lucide-react';
+import AppHeader from '@/components/AppHeader';
 import { SALES_EMAIL } from '@/lib/contact';
 
 export default function Contact() {
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border safe-area-pt">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 font-bold text-foreground">
-            <HardHat className="w-5 h-5 text-amber-500" /> ScaffKeep
-          </Link>
-          <nav className="flex items-center gap-4 text-sm">
-            <Link to="/about" className="text-muted-foreground hover:text-foreground">About</Link>
-            <Link to="/contact" className="text-foreground font-medium">Contact</Link>
-            <Link to="/login" className="text-muted-foreground hover:text-foreground">Log in</Link>
-          </nav>
-        </div>
-      </header>
+      <AppHeader />
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-12">
         <h1 className="text-3xl font-bold text-foreground">Contact ScaffKeep</h1>

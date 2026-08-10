@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { HardHat } from 'lucide-react';
+import AppHeader from '@/components/AppHeader';
 
 const CHECKLIST = [
   'Track CISRS cards',
@@ -30,18 +30,7 @@ const RAG = [
 export default function About() {
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border safe-area-pt">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 font-bold text-foreground">
-            <HardHat className="w-5 h-5 text-amber-500" /> ScaffKeep
-          </Link>
-          <nav className="flex items-center gap-4 text-sm">
-            <Link to="/about" className="text-foreground font-medium">About</Link>
-            <Link to="/contact" className="text-muted-foreground hover:text-foreground">Contact</Link>
-            <Link to="/login" className="text-muted-foreground hover:text-foreground">Log in</Link>
-          </nav>
-        </div>
-      </header>
+      <AppHeader />
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-12 text-muted-foreground leading-relaxed">
         <h1 className="text-3xl font-bold text-foreground">ScaffKeep</h1>
