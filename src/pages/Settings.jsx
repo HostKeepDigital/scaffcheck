@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Building2, CreditCard, Check, AlertCircle, Trash2 } from 'lucide-react';
 import { PLANS, annualSaving } from '@/lib/stripePrices';
 import BillingToggle from '@/components/BillingToggle';
+import BillingCard from '@/components/BillingCard';
 import EnterpriseContactCard from '@/components/EnterpriseContactCard';
 import { planLimit } from '@/lib/stripePrices';
 import {
@@ -194,45 +195,7 @@ export default function Settings() {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader><CardTitle className="flex items-center gap-2"><CreditCard className="w-5 h-5" /> Billing</CardTitle></CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Plan</span>
-                  <span className="font-medium capitalize">{account.plan}</span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Status</span>
-                  <span className="font-medium">
-                    {account.subscription_status === 'trial_active' && 'Trial active'}
-                    {account.subscription_status === 'active' && 'Active'}
-                    {account.subscription_status === 'lapsed' && 'Lapsed'}
-                  </span>
-                </div>
-                {account.subscription_status === 'trial_active' && account.trial_ends_at && (
-                  <p className="text-xs text-muted-foreground">
-                    Trial expires {new Date(account.trial_ends_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}. Your subscription will auto-renew after the trial ends.
-                  </p>
-                )}
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Operatives tracked</span>
-                  <span className="font-medium">
-                    {account.operative_count}{planLimit(account.plan) ? ` of ${planLimit(account.plan)}` : ''}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Billed</span>
-                  <span className="font-medium capitalize">{account.billing || 'monthly'}</span>
-                </div>
-                <Button className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold"
-                  onClick={() => handleManageBilling()} disabled={saving}>
-                  {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : 'Manage subscription & billing'}
-                </Button>
-                <p className="text-xs text-muted-foreground text-center">
-                  Change your plan, switch between monthly and annual, update your card, or download invoices. Any price difference is worked out for you automatically.
-                </p>
-              </CardContent>
-            </Card>
+            <BillingCard account={account} onManage={() => handleManageBilling()} busy={saving} />
 
             <EnterpriseContactCard companyName={account.company_name} />
           </div>
