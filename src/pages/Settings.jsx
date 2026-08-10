@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Building2, CreditCard, Check, AlertCircle, Trash2 } from 'lucide-react';
-import { PLANS } from '@/lib/stripePrices';
+import { PLANS, annualSaving } from '@/lib/stripePrices';
 import BillingToggle from '@/components/BillingToggle';
 import {
   AlertDialog,
@@ -159,6 +159,9 @@ export default function Settings() {
                       {plan.badge && <span className="inline-block px-2 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-bold mb-1">{plan.badge}</span>}
                       <div className="font-semibold">{plan.name}</div>
                       <div className="text-2xl font-bold mt-1">{plan[billingPeriod].priceLabel}<span className="text-sm font-normal text-muted-foreground">{billingPeriod === 'annual' ? '/year' : '/month'}</span></div>
+                      {billingPeriod === 'annual' && annualSaving(plan) > 0 && (
+                        <p className="text-xs font-medium text-green-500 mt-1">Save £{annualSaving(plan)} a year</p>
+                      )}
                       <p className="text-xs text-muted-foreground mt-1">{plan.description}</p>
                     </button>
                   ))}

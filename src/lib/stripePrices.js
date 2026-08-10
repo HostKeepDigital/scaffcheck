@@ -28,4 +28,10 @@ export const PLANS = [
   },
 ];
 
+export function annualSaving(plan) {
+  const monthlyForYear = plan.monthly.price * 12;
+  const saving = monthlyForYear - plan.annual.price;
+  return saving > 0 ? saving : 0;
+}
+
 export const TRIAL_DAYS = 7;

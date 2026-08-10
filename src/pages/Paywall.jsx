@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Check, AlertCircle, ShieldAlert } from 'lucide-react';
 import { useState } from 'react';
-import { PLANS } from '@/lib/stripePrices';
+import { PLANS, annualSaving } from '@/lib/stripePrices';
 import BillingToggle from '@/components/BillingToggle';
 
 export default function Paywall() {
@@ -89,6 +89,9 @@ export default function Paywall() {
                   <span className="text-3xl font-bold">{plan[billingPeriod].priceLabel}</span>
                   <span className="text-muted-foreground">{billingPeriod === 'annual' ? '/year' : '/month'}</span>
                 </div>
+                {billingPeriod === 'annual' && annualSaving(plan) > 0 && (
+                  <p className="text-xs font-medium text-green-500 mt-1">Save £{annualSaving(plan)} a year</p>
+                )}
                 <p className="text-sm text-muted-foreground mb-4">{plan.description}</p>
                 <Button className={`w-full ${plan.highlight ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}
                   onClick={() => handleSubscribe(plan.id)} disabled={subscribing !== null}>

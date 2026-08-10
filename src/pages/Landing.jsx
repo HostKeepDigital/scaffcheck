@@ -2,7 +2,7 @@ import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { HardHat, ShieldCheck, BellRing, FileText, Upload, ArrowRight, Check } from 'lucide-react';
-import { PLANS } from '@/lib/stripePrices';
+import { PLANS, annualSaving } from '@/lib/stripePrices';
 import BillingToggle from '@/components/BillingToggle';
 import { useState } from 'react';
 
@@ -109,6 +109,9 @@ export default function Landing() {
                   <span className="text-4xl font-bold">{plan[billingPeriod].priceLabel}</span>
                   <span className="text-slate-400">{billingPeriod === 'annual' ? '/year' : '/month'}</span>
                 </div>
+                {billingPeriod === 'annual' && annualSaving(plan) > 0 && (
+                  <p className="text-xs font-medium text-green-500 mt-1">Save £{annualSaving(plan)} a year</p>
+                )}
                 <p className="mt-3 text-sm text-slate-400">{plan.description}</p>
                 <Button className={`w-full mt-6 h-11 font-semibold ${plan.highlight ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}
                   onClick={() => navigate(isAuthenticated ? '/settings' : '/register')}>
