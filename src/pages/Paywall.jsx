@@ -8,12 +8,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Check, AlertCircle, ShieldAlert } from 'lucide-react';
 import { useState } from 'react';
 import { PLANS } from '@/lib/stripePrices';
+import BillingToggle from '@/components/BillingToggle';
 
 export default function Paywall() {
   const { user } = useAuth();
   const { account, loading, refreshAccount } = useAccount();
   const navigate = useNavigate();
   const [subscribing, setSubscribing] = useState(null);
+  const [billingPeriod, setBillingPeriod] = useState('monthly');
   const [error, setError] = useState('');
 
   const handleSubscribe = async (planId) => {
@@ -26,6 +28,7 @@ export default function Paywall() {
     try {
       const response = await base44.functions.invoke('stripeCheckout', {
         plan: planId,
+        billing: billingPeriod,
         company_name: account?.company_name || '',
         user_id: user.id,
       });
@@ -70,7 +73,11 @@ export default function Paywall() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+        <div className="flex justify-center mb-6">
+          <BillingToggle value={billingPeriod} onChange={setBillingPeriod} />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {PLANS.map((plan) => (
             <Card key={plan.id} className={plan.highlight ? 'border-2 border-amber-500' : ''}>
               <CardHeader>
@@ -79,8 +86,8 @@ export default function Paywall() {
               </CardHeader>
               <CardContent>
                 <div className="flex items-baseline gap-1 mb-2">
-                  <span className="text-3xl font-bold">{plan.priceLabel}</span>
-                  <span className="text-muted-foreground">{plan.period}</span>
+                  <span className="text-3xl font-bold">{plan[billingPeriod].priceLabel}</span>
+                  <span className="text-muted-foreground">{billingPeriod === 'annual' ? '/year' : '/month'}</span>
                 </div>
                 <p className="text-sm text-muted-foreground mb-4">{plan.description}</p>
                 <Button className={`w-full ${plan.highlight ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}

@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Building2, CreditCard, Check, AlertCircle, Trash2 } from 'lucide-react';
 import { PLANS } from '@/lib/stripePrices';
+import BillingToggle from '@/components/BillingToggle';
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -27,7 +28,8 @@ export default function Settings() {
   const { account, loading, refreshAccount } = useAccount();
   const navigate = useNavigate();
   const [companyName, setCompanyName] = useState('');
-  const [selectedPlan, setSelectedPlan] = useState('founding');
+  const [selectedPlan, setSelectedPlan] = useState('crew');
+  const [billingPeriod, setBillingPeriod] = useState('monthly');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [deleting, setDeleting] = useState(false);
@@ -43,6 +45,7 @@ export default function Settings() {
     try {
       const response = await base44.functions.invoke('stripeCheckout', {
         plan: selectedPlan,
+        billing: billingPeriod,
         company_name: companyName,
         user_id: user.id,
       });
@@ -146,13 +149,16 @@ export default function Settings() {
                 <CardTitle className="flex items-center gap-2"><CreditCard className="w-5 h-5" /> Choose Your Plan</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="flex justify-center mb-4">
+                  <BillingToggle value={billingPeriod} onChange={setBillingPeriod} />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {PLANS.map((plan) => (
                     <button key={plan.id} onClick={() => setSelectedPlan(plan.id)}
-                      className={`text-left p-4 rounded-xl border-2 transition ${selectedPlan === plan.id ? 'border-amber-500 bg-amber-500/10' : 'border-border hover:border-amber-500/50'}`}>
+                      className={`text-left p-4 rounded-xl border-2 transition ${selectedPlan === plan.id ? 'border-amber-500 bg-amber-500/10' : plan.highlight ? 'border-amber-500/60 hover:border-amber-500' : 'border-border hover:border-amber-500/50'}`}>
                       {plan.badge && <span className="inline-block px-2 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-bold mb-1">{plan.badge}</span>}
                       <div className="font-semibold">{plan.name}</div>
-                      <div className="text-2xl font-bold mt-1">{plan.priceLabel}<span className="text-sm font-normal text-muted-foreground">{plan.period}</span></div>
+                      <div className="text-2xl font-bold mt-1">{plan[billingPeriod].priceLabel}<span className="text-sm font-normal text-muted-foreground">{billingPeriod === 'annual' ? '/year' : '/month'}</span></div>
                       <p className="text-xs text-muted-foreground mt-1">{plan.description}</p>
                     </button>
                   ))}

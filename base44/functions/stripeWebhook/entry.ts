@@ -26,6 +26,7 @@ Deno.serve(async (req) => {
         const userId = session.metadata?.user_id;
         const companyName = session.metadata?.company_name || 'My Company';
         const plan = session.metadata?.plan;
+        const billing = session.metadata?.billing || 'monthly';
 
         const trialEnd = new Date();
         trialEnd.setDate(trialEnd.getDate() + 7);
@@ -40,6 +41,7 @@ Deno.serve(async (req) => {
             stripe_customer_id: session.customer,
             stripe_subscription_id: session.subscription,
             plan,
+            billing,
           });
         } else {
           const newAccount = await base44.asServiceRole.entities.Account.create({
@@ -50,6 +52,7 @@ Deno.serve(async (req) => {
             stripe_customer_id: session.customer,
             stripe_subscription_id: session.subscription,
             plan,
+            billing,
             operative_count: 0,
           });
           accountId = newAccount.id;

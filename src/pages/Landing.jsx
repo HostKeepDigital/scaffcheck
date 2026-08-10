@@ -3,10 +3,13 @@ import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { HardHat, ShieldCheck, BellRing, FileText, Upload, ArrowRight, Check } from 'lucide-react';
 import { PLANS } from '@/lib/stripePrices';
+import BillingToggle from '@/components/BillingToggle';
+import { useState } from 'react';
 
 export default function Landing() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [billingPeriod, setBillingPeriod] = useState('monthly');
 
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
@@ -92,7 +95,10 @@ export default function Landing() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-2">Simple, honest pricing</h2>
           <p className="text-center text-slate-400 mb-10">7-day free trial. No setup fee. Cancel anytime.</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          <div className="flex justify-center mb-10">
+            <BillingToggle value={billingPeriod} onChange={setBillingPeriod} dark />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {PLANS.map((plan) => (
               <div key={plan.id} className={`rounded-2xl p-6 border-2 ${plan.highlight ? 'border-amber-500 bg-slate-800' : 'border-slate-700 bg-slate-800/50'}`}>
                 {plan.badge && (
@@ -100,8 +106,8 @@ export default function Landing() {
                 )}
                 <h3 className="text-xl font-bold">{plan.name}</h3>
                 <div className="mt-2 flex items-baseline gap-1">
-                  <span className="text-4xl font-bold">{plan.priceLabel}</span>
-                  <span className="text-slate-400">{plan.period}</span>
+                  <span className="text-4xl font-bold">{plan[billingPeriod].priceLabel}</span>
+                  <span className="text-slate-400">{billingPeriod === 'annual' ? '/year' : '/month'}</span>
                 </div>
                 <p className="mt-3 text-sm text-slate-400">{plan.description}</p>
                 <Button className={`w-full mt-6 h-11 font-semibold ${plan.highlight ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}

@@ -7,14 +7,16 @@ Deno.serve(async (req) => {
     const user = await base44.auth.me();
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { plan, company_name } = await req.json();
+    const { plan, billing, company_name } = await req.json();
     const user_id = user.id;
 
     const priceMap = {
-      founding: 'price_1Tl6ZJG98uz9Nro6zXvcC47U',
-      standard: 'price_1Tl6ZJG98uz9Nro6MXSmSGuL',
+      crew:       { monthly: 'price_1U12OmBz3dL1znKQ6FAgcgtz', annual: 'price_1U12OmBz3dL1znKQ903TFoxT' },
+      contractor: { monthly: 'price_1U12gZBz3dL1znKQTiK3Apvr', annual: 'price_1U12gsBz3dL1znKQimCQMrcQ' },
+      firm:       { monthly: 'price_1U12hlBz3dL1znKQbSWtKaqP', annual: 'price_1U12iDBz3dL1znKQLVFTGrnC' },
     };
-    const priceId = priceMap[plan];
+    const billingPeriod = billing === 'annual' ? 'annual' : 'monthly';
+    const priceId = priceMap[plan]?.[billingPeriod];
     if (!priceId) return Response.json({ error: 'Invalid plan' }, { status: 400 });
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
@@ -34,6 +36,7 @@ Deno.serve(async (req) => {
           user_id,
           company_name: company_name || '',
           plan,
+          billing: billingPeriod,
           base44_app_id: Deno.env.get('BASE44_APP_ID'),
         },
       },
@@ -41,6 +44,7 @@ Deno.serve(async (req) => {
         user_id,
         company_name: company_name || '',
         plan,
+        billing: billingPeriod,
         base44_app_id: Deno.env.get('BASE44_APP_ID'),
       },
       success_url: `${origin}/dashboard?checkout=success`,

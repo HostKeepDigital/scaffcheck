@@ -30,9 +30,18 @@
     "plan": {
       "type": "string",
       "enum": [
-        "founding",
-        "standard"
+        "crew",
+        "contractor",
+        "firm"
       ]
+    },
+    "billing": {
+      "type": "string",
+      "enum": [
+        "monthly",
+        "annual"
+      ],
+      "default": "monthly"
     },
     "operative_count": {
       "type": "integer",
