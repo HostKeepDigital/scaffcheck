@@ -8,6 +8,10 @@
     "operative_id": {
       "type": "string"
     },
+    "description": {
+      "type": "string",
+      "maxLength": 1000
+    },
     "document_type": {
       "type": "string",
       "enum": [

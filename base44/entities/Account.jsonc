@@ -8,6 +8,10 @@
     "owner_user_id": {
       "type": "string"
     },
+    "description": {
+      "type": "string",
+      "maxLength": 1000
+    },
     "subscription_status": {
       "type": "string",
       "enum": [
