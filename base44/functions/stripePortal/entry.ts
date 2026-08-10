@@ -1,5 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 import Stripe from 'npm:stripe@18.3.0';
+import { stripeSecretKey } from '../../shared/stripeMode.ts';
 
 Deno.serve(async (req) => {
   try {
@@ -16,7 +17,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'No Stripe customer found' }, { status: 404 });
     }
 
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
+    const stripe = new Stripe(stripeSecretKey());
     const origin = req.headers.get('origin') || 'https://app.base44.com';
 
     let body = {};

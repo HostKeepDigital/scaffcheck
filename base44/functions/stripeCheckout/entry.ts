@@ -1,5 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 import Stripe from 'npm:stripe@18.3.0';
+import { stripeSecretKey, priceId } from '../../shared/stripeMode.ts';
 
 Deno.serve(async (req) => {
   try {
@@ -10,16 +11,11 @@ Deno.serve(async (req) => {
     const { plan, billing, company_name } = await req.json();
     const user_id = user.id;
 
-    const priceMap = {
-      crew:       { monthly: 'price_1U2uCrJJqUTDO3orWHT0F9O1', annual: 'price_1U2uCsJJqUTDO3orVoOVLL1o' },
-      contractor: { monthly: 'price_1U2uCsJJqUTDO3orAihO2oA4', annual: 'price_1U2uCsJJqUTDO3orACmfE3vr' },
-      firm:       { monthly: 'price_1U2uCsJJqUTDO3orK4U2eA3C', annual: 'price_1U2uCsJJqUTDO3orGk5wyrmI' },
-    };
     const billingPeriod = billing === 'annual' ? 'annual' : 'monthly';
-    const priceId = priceMap[plan]?.[billingPeriod];
-    if (!priceId) return Response.json({ error: 'Invalid plan' }, { status: 400 });
+    const price = priceId(plan, billingPeriod);
+    if (!price) return Response.json({ error: 'Invalid plan' }, { status: 400 });
 
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
+    const stripe = new Stripe(stripeSecretKey());
     const origin = req.headers.get('origin') || 'https://app.base44.com';
 
     // Check for existing account/customer
@@ -29,7 +25,7 @@ Deno.serve(async (req) => {
 
     const sessionParams = {
       mode: 'subscription',
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: [{ price, quantity: 1 }],
       subscription_data: {
         trial_period_days: 7,
         metadata: {

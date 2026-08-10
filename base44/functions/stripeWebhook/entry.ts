@@ -1,19 +1,20 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 import Stripe from 'npm:stripe@18.3.0';
+import { stripeSecretKey, stripeWebhookSecret } from '../../shared/stripeMode.ts';
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const body = await req.text();
     const signature = req.headers.get('stripe-signature');
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
+    const stripe = new Stripe(stripeSecretKey());
 
     let event;
     try {
       event = await stripe.webhooks.constructEventAsync(
         body,
         signature,
-        Deno.env.get('STRIPE_WEBHOOK_SECRET')
+        stripeWebhookSecret()
       );
     } catch (err) {
       console.error('Webhook signature verification failed:', err.message);
