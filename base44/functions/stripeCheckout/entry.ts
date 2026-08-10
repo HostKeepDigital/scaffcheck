@@ -11,9 +11,9 @@ Deno.serve(async (req) => {
     const user_id = user.id;
 
     const priceMap = {
-      crew:       { monthly: 'price_1U12OmBz3dL1znKQ6FAgcgtz', annual: 'price_1U12OmBz3dL1znKQ903TFoxT' },
-      contractor: { monthly: 'price_1U12gZBz3dL1znKQTiK3Apvr', annual: 'price_1U12gsBz3dL1znKQimCQMrcQ' },
-      firm:       { monthly: 'price_1U12hlBz3dL1znKQbSWtKaqP', annual: 'price_1U12iDBz3dL1znKQLVFTGrnC' },
+      crew:       { monthly: 'price_1U2uCrJJqUTDO3orWHT0F9O1', annual: 'price_1U2uCsJJqUTDO3orVoOVLL1o' },
+      contractor: { monthly: 'price_1U2uCsJJqUTDO3orAihO2oA4', annual: 'price_1U2uCsJJqUTDO3orACmfE3vr' },
+      firm:       { monthly: 'price_1U2uCsJJqUTDO3orK4U2eA3C', annual: 'price_1U2uCsJJqUTDO3orGk5wyrmI' },
     };
     const billingPeriod = billing === 'annual' ? 'annual' : 'monthly';
     const priceId = priceMap[plan]?.[billingPeriod];
