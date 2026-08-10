@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { X, Filter } from 'lucide-react';
+import { X } from 'lucide-react';
 import { getOperativeCompliance } from '@/lib/compliance';
 
 export default function SummaryBar({ operatives, documentsByOperative, activeFilter = null, onFilterChange }) {
@@ -36,9 +36,11 @@ export default function SummaryBar({ operatives, documentsByOperative, activeFil
             }`}
             style={{ backgroundColor: c.bg }}
           >
-            <span className="absolute top-1.5 right-1.5 opacity-70">
-              {active ? <X className="w-3.5 h-3.5" /> : <Filter className="w-3 h-3" />}
-            </span>
+            {active && (
+              <span className="absolute top-1.5 right-1.5 opacity-70">
+                <X className="w-3.5 h-3.5" />
+              </span>
+            )}
             <span className="text-2xl sm:text-4xl font-bold tabular-nums">{c.count}</span>
             <span className="text-[10px] sm:text-xs font-medium mt-0.5 opacity-90 text-center">{c.label}</span>
           </motion.button>

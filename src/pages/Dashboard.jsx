@@ -175,7 +175,7 @@ export default function Dashboard() {
                 operatives={operatives}
                 documentsByOperative={docsByOperative}
                 activeFilter={statusFilter}
-                onFilterChange={setStatusFilter}
+                onFilterChange={(rag) => { setStatusFilter(rag); setSearch(''); }}
               />
             </div>
 
