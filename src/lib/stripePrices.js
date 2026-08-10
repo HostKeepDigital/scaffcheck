@@ -1,7 +1,7 @@
 export const STRIPE_PRICES = {
   crew:       { monthly: 'price_1U2ryEBQ50uYJDYF2oUicmx7', annual: 'price_1U2ryEBQ50uYJDYFHlnI7FeT' },
-  contractor: { monthly: 'price_1U2uCsJJqUTDO3orAihO2oA4', annual: 'price_1U2uCsJJqUTDO3orACmfE3vr' },
-  firm:       { monthly: 'price_1U2ryEBQ50uYJDYFlx5wf6WS', annual: 'price_1U2ryEBQ50uYJDYF8ge4w2ho' },
+  contractor: { monthly: 'price_1U2ryEBQ50uYJDYFlx5wf6WS', annual: 'price_1U2ryEBQ50uYJDYF8ge4w2ho' },
+  firm:       { monthly: 'price_1U2ryEBQ50uYJDYFafib9LQo', annual: 'price_1U2ryEBQ50uYJDYFtKkAyXAV' },
 };
 
 export const PLANS = [

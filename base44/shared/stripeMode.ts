@@ -16,9 +16,9 @@ export function stripeWebhookSecret(): string {
 }
 
 const TEST_PRICES = {
-  crew:       { monthly: 'price_1U2uyiBQ50uYJDYFsIViUL83', annual: 'price_1U2uyiBQ50uYJDYF0Kw4hiWE' },
-  contractor: { monthly: 'price_1U2uyiBQ50uYJDYF2HrbshSm', annual: 'price_1U2uyjBQ50uYJDYFFpQUSI93' },
-  firm:       { monthly: 'price_1U2uyjBQ50uYJDYF9BvfLSzG', annual: 'price_1U2uyjBQ50uYJDYF1KRVsggw' },
+  crew:       { monthly: 'price_1U2ryEBQ50uYJDYF2oUicmx7', annual: 'price_1U2ryEBQ50uYJDYFHlnI7FeT' },
+  contractor: { monthly: 'price_1U2ryEBQ50uYJDYFlx5wf6WS', annual: 'price_1U2ryEBQ50uYJDYF8ge4w2ho' },
+  firm:       { monthly: 'price_1U2ryEBQ50uYJDYFafib9LQo', annual: 'price_1U2ryEBQ50uYJDYFtKkAyXAV' },
 };
 
 const LIVE_PRICES = {
