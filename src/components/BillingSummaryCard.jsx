@@ -110,8 +110,8 @@ export default function BillingSummaryCard({ account, onManage, busy, ragCounts 
         <div className="p-5 space-y-3">
           <p className="text-xs text-muted-foreground">
             {isTrial
-              ? "Changing plan won't affect your free trial. Upgrades take effect straight away, and your first payment on the new plan is taken when the trial ends."
-              : "Upgrades take effect straight away — you'll be charged only the difference for the rest of your current billing period, not a full new one. Downgrades and switches to monthly billing start at your next renewal."}
+              ? "Changing plan won't affect your free trial."
+              : "Upgrades apply straight away and you're charged only the difference for the rest of the period; downgrades start at your next renewal."}
           </p>
           <Button
             className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold h-11"
@@ -122,13 +122,6 @@ export default function BillingSummaryCard({ account, onManage, busy, ragCounts 
             {isTrial ? 'Manage billing & invoices' : <>Manage subscription &amp; billing</>}
           </Button>
           <DowngradeLimitNotice operativeCount={account.operative_count || 0} />
-          <ul className="text-xs text-muted-foreground space-y-1">
-            <li>• Change plan (Crew, Contractor or Firm)</li>
-            <li>• Switch between monthly and annual billing</li>
-            <li>• Update your card or billing address</li>
-            <li>• Download invoices and receipts</li>
-            <li>• Cancel your subscription</li>
-          </ul>
         </div>
       </CardContent>
     </Card>
