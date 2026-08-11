@@ -108,6 +108,12 @@ export default function BillingSummaryCard({ account, onManage, busy, ragCounts 
 
         {/* Actions */}
         <div className="p-5 space-y-3">
+          {!isTrial && (
+            <p className="text-xs text-muted-foreground">
+              Upgrades take effect straight away — you'll be charged only the difference for the rest of your current
+              billing period, not a full new one. Downgrades and switches to monthly billing start at your next renewal.
+            </p>
+          )}
           <Button
             className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold h-11"
             onClick={onManage}
