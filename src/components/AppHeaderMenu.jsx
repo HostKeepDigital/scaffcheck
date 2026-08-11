@@ -1,11 +1,13 @@
 import { useNavigate } from 'react-router-dom';
-import { Menu, LayoutDashboard, Settings, Info, Mail } from 'lucide-react';
+import { Menu, LayoutDashboard, Settings, Info, Mail, LogOut } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 
 const ITEMS = [
@@ -37,6 +39,11 @@ export default function AppHeaderMenu() {
             {label}
           </DropdownMenuItem>
         ))}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={() => base44.auth.logout('/')} className="py-2.5">
+          <LogOut className="w-4 h-4 mr-2" />
+          Log out
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
