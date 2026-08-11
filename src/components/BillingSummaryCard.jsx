@@ -108,11 +108,15 @@ export default function BillingSummaryCard({ account, onManage, busy, ragCounts 
 
         {/* Actions */}
         <div className="p-5 space-y-3">
-          <p className="text-xs text-muted-foreground">
-            {isTrial
-              ? "Changing plan won't affect your free trial. Post-trial, upgrades apply straight away and you're charged only the difference for the rest of the period; downgrades start at your next renewal."
-              : "Upgrades apply straight away and you're charged only the difference for the rest of the period; downgrades start at your next renewal."}
-          </p>
+          <div className="space-y-1">
+            {isTrial && (
+              <p className="text-xs text-muted-foreground">Changing plan won't affect your free trial.</p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              {isTrial ? 'Post-trial, upgrades' : 'Upgrades'} apply straight away and you're charged only the difference
+              for the rest of the period; downgrades start at your next renewal.
+            </p>
+          </div>
           <Button
             className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold h-11"
             onClick={onManage}
