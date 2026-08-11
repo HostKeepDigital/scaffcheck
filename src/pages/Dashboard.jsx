@@ -125,17 +125,18 @@ export default function Dashboard() {
             <h1 className="text-2xl font-bold text-foreground">Operatives</h1>
             <p className="text-sm text-muted-foreground">{account?.company_name}</p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={handleReport} disabled={reporting || operatives.length === 0}>
-              {reporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileDown className="w-4 h-4 mr-2" />}
-              Compliance Report
-            </Button>
-            <Button variant="outline" onClick={() => setShowImport(true)} disabled={atLimit}>
-              <Upload className="w-4 h-4 mr-2" /> Import CSV
-            </Button>
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-2">
             <Button onClick={() => setShowForm(true)} disabled={atLimit}
-              className="bg-primary text-primary-foreground hover:bg-primary/90">
+              className="col-span-2 h-11 sm:h-9 sm:order-3 bg-primary text-primary-foreground hover:bg-primary/90">
               {atLimit ? <Lock className="w-4 h-4 mr-2" /> : <Plus className="w-4 h-4 mr-2" />} Add Operative
+            </Button>
+            <Button variant="outline" className="h-11 sm:h-9 sm:order-1" onClick={handleReport} disabled={reporting || operatives.length === 0}>
+              {reporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileDown className="w-4 h-4 mr-2" />}
+              <span className="sm:hidden">Report</span>
+              <span className="hidden sm:inline">Compliance Report</span>
+            </Button>
+            <Button variant="outline" className="h-11 sm:h-9 sm:order-2" onClick={() => setShowImport(true)} disabled={atLimit}>
+              <Upload className="w-4 h-4 mr-2" /> Import CSV
             </Button>
           </div>
         </div>
@@ -160,10 +161,10 @@ export default function Dashboard() {
           <div className="text-center py-20">
             <p className="text-muted-foreground mb-4">No operatives yet. Add your first one to get started.</p>
             <div className="flex flex-col sm:flex-row gap-2 justify-center">
-              <Button onClick={() => setShowForm(true)} className="bg-primary text-primary-foreground hover:bg-primary/90">
+              <Button onClick={() => setShowForm(true)} className="h-11 sm:h-9 bg-primary text-primary-foreground hover:bg-primary/90">
                 <Plus className="w-4 h-4 mr-2" /> Add Operative
               </Button>
-              <Button variant="outline" onClick={() => setShowImport(true)}>
+              <Button variant="outline" className="h-11 sm:h-9" onClick={() => setShowImport(true)}>
                 <Upload className="w-4 h-4 mr-2" /> Import from CSV
               </Button>
             </div>
