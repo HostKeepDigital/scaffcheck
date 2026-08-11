@@ -218,14 +218,15 @@ export default function Settings() {
               </CardContent>
             </Card>
 
-            <BillingSummaryCard account={account} onManage={() => handleManageBilling()} busy={saving} ragCounts={ragCounts} />
-
-            <EnterpriseContactCard companyName={account.company_name} />
+            <div className="space-y-3">
+              <BillingSummaryCard account={account} onManage={() => handleManageBilling()} busy={saving} ragCounts={ragCounts} />
+              <EnterpriseContactCard companyName={account.company_name} />
+            </div>
           </div>
         )}
 
         {account && (
-          <Card className="border-red-200 dark:border-red-900/50">
+          <Card className="mt-10 border-red-200 dark:border-red-900/50">
             <CardHeader><CardTitle className="flex items-center gap-2 text-red-700 dark:text-red-400"><Trash2 className="w-5 h-5" /> Danger Zone</CardTitle></CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-4">Permanently delete your account and all associated data, including operatives and compliance documents. This action cannot be undone.</p>
