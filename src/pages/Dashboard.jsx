@@ -159,15 +159,7 @@ export default function Dashboard() {
           </div>
         ) : operatives.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-muted-foreground mb-4">No operatives yet. Add your first one to get started.</p>
-            <div className="flex flex-col sm:flex-row gap-2 justify-center">
-              <Button onClick={() => setShowForm(true)} className="h-11 sm:h-9 bg-primary text-primary-foreground hover:bg-primary/90">
-                <Plus className="w-4 h-4 mr-2" /> Add Operative
-              </Button>
-              <Button variant="outline" className="h-11 sm:h-9" onClick={() => setShowImport(true)}>
-                <Upload className="w-4 h-4 mr-2" /> Import from CSV
-              </Button>
-            </div>
+            <p className="text-muted-foreground">No operatives yet. Add your first one to get started.</p>
           </div>
         ) : (
           <>
