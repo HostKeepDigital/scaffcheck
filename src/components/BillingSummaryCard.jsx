@@ -110,7 +110,7 @@ export default function BillingSummaryCard({ account, onManage, busy, ragCounts 
         <div className="p-5 space-y-3">
           <p className="text-xs text-muted-foreground">
             {isTrial
-              ? "Changing plan won't affect your free trial."
+              ? "Changing plan won't affect your free trial. Post-trial, upgrades apply straight away and you're charged only the difference for the rest of the period; downgrades start at your next renewal."
               : "Upgrades apply straight away and you're charged only the difference for the rest of the period; downgrades start at your next renewal."}
           </p>
           <Button
