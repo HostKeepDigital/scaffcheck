@@ -9,7 +9,7 @@ import { Loader2, Check, AlertCircle, ShieldAlert } from 'lucide-react';
 import { useState } from 'react';
 import { PLANS, annualSaving } from '@/lib/stripePrices';
 import BillingToggle from '@/components/BillingToggle';
-import EnterpriseContactCard from '@/components/EnterpriseContactCard';
+import EnterpriseCalculator from '@/components/EnterpriseCalculator';
 
 export default function Paywall() {
   const { user } = useAuth();
@@ -104,7 +104,7 @@ export default function Paywall() {
         </div>
 
         <div className="mt-4">
-          <EnterpriseContactCard companyName={account?.company_name || ''} />
+          <EnterpriseCalculator companyName={account?.company_name || ''} billingPeriod={billingPeriod} />
         </div>
 
         <div className="mt-6 text-center">

@@ -14,7 +14,7 @@ import { Loader2, Building2, CreditCard, Check, AlertCircle, Trash2 } from 'luci
 import { PLANS, annualSaving } from '@/lib/stripePrices';
 import BillingToggle from '@/components/BillingToggle';
 import BillingSummaryCard from '@/components/BillingSummaryCard';
-import EnterpriseContactCard from '@/components/EnterpriseContactCard';
+import EnterpriseCalculator from '@/components/EnterpriseCalculator';
 import { planLimit } from '@/lib/stripePrices';
 import {
   AlertDialog,
@@ -196,7 +196,7 @@ export default function Settings() {
                   <Check className="w-4 h-4 text-green-600 dark:text-green-400" /> 7-day free trial · Card required · Cancel anytime
                 </div>
                 <div className="mt-4">
-                  <EnterpriseContactCard companyName={companyName} />
+                  <EnterpriseCalculator companyName={companyName} billingPeriod={billingPeriod} />
                 </div>
                 <Button className="w-full mt-4 bg-amber-500 hover:bg-amber-600 text-white font-semibold h-11"
                   onClick={handleStartTrial} disabled={saving}>
@@ -220,7 +220,7 @@ export default function Settings() {
 
             <div className="space-y-3">
               <BillingSummaryCard account={account} onManage={() => handleManageBilling()} busy={saving} ragCounts={ragCounts} />
-              <EnterpriseContactCard companyName={account.company_name} />
+              <EnterpriseCalculator companyName={account.company_name} />
             </div>
           </div>
         )}

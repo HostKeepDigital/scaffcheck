@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { HardHat, ShieldCheck, BellRing, FileText, Upload, ArrowRight, Check } from 'lucide-react';
 import { PLANS, annualSaving } from '@/lib/stripePrices';
 import BillingToggle from '@/components/BillingToggle';
+import EnterpriseCalculator from '@/components/EnterpriseCalculator';
 import { useState } from 'react';
 
 export default function Landing() {
@@ -121,6 +122,9 @@ export default function Landing() {
                 </Button>
               </div>
             ))}
+          </div>
+          <div className="mt-8">
+            <EnterpriseCalculator billingPeriod={billingPeriod} dark />
           </div>
         </div>
       </section>
