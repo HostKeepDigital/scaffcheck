@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { HardHat, LogOut, LayoutDashboard, Settings } from 'lucide-react';
+import AppHeaderMenu from '@/components/AppHeaderMenu';
 
 export default function AppHeader({ showNav = true }) {
   const { isAuthenticated, logout } = useAuth();
@@ -43,6 +44,7 @@ export default function AppHeader({ showNav = true }) {
                   <LogOut className="w-4 h-4 sm:mr-1.5" />
                   <span className="hidden sm:inline">Log out</span>
                 </Button>
+                <AppHeaderMenu />
               </>
             ) : (
               <>
