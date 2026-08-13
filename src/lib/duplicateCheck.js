@@ -34,6 +34,20 @@ function attributeDiff(a, b) {
   return null;
 }
 
+const CONTACT_LABELS = { email: 'email address', phone: 'phone number' };
+
+// Notes where one side has contact data the other lacks
+function contactGaps(a, b) {
+  const notes = [];
+  for (const field of Object.keys(CONTACT_LABELS)) {
+    const av = n(a[field]);
+    const bv = n(b[field]);
+    if (!av && bv) notes.push(`this row has no ${CONTACT_LABELS[field]}`);
+    else if (av && !bv) notes.push(`the matching row has no ${CONTACT_LABELS[field]}`);
+  }
+  return notes;
+}
+
 // rows: parsed drafts, existing: account's current operatives, rowNumbers: CSV row numbers.
 // Returns [{ status, detail }] aligned with rows.
 export function detectDuplicates(rows, existing = [], rowNumbers = []) {
@@ -44,9 +58,9 @@ export function detectDuplicates(rows, existing = [], rowNumbers = []) {
     const consider = (result, other, label, sameLabel) => {
       if (!result) return;
       if (result === 'exact' && status !== 'exact') {
-        const diff = attributeDiff(row, other);
+        const parts = [attributeDiff(row, other), ...contactGaps(row, other)].filter(Boolean);
         status = 'exact';
-        detail = diff ? `${label} — ${diff}` : sameLabel;
+        detail = parts.length ? `${label} — ${parts.join(', ')}` : sameLabel;
       } else if (!status) {
         status = 'possible';
         detail = 'Same name, no matching contact details';
