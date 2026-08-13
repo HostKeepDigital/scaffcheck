@@ -10,7 +10,7 @@ import OperativeForm from '@/components/OperativeForm';
 import { Button } from '@/components/ui/button';
 import { Plus, FileDown, Loader2, ChevronRight, Lock, Upload } from 'lucide-react';
 import BulkImportDialog from '@/components/BulkImportDialog';
-import { planLimit } from '@/lib/stripePrices';
+import { planLimit, PLANS } from '@/lib/stripePrices';
 import { Link } from 'react-router-dom';
 import { getOperativeCompliance } from '@/lib/compliance';
 import { generateComplianceReport } from '@/lib/pdfReport';
@@ -249,6 +249,9 @@ export default function Dashboard() {
         onClose={() => setShowImport(false)}
         accountId={account?.id}
         remaining={remaining}
+        planName={PLANS.find((p) => p.id === account?.plan)?.name || 'current'}
+        limit={limit}
+        currentCount={account?.operative_count ?? operatives.length}
         onImported={loadData}
       />
     </div>

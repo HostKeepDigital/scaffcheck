@@ -1,4 +1,5 @@
 import { CheckCircle2, AlertTriangle, Info } from 'lucide-react';
+import BulkImportBlockedNotice from '@/components/BulkImportBlockedNotice';
 
 const FIELD_LABELS = {
   full_name: 'Name',
@@ -9,9 +10,9 @@ const FIELD_LABELS = {
   notes: 'Notes',
 };
 
-export default function BulkImportSummary({ result, remaining }) {
+export default function BulkImportSummary({ result, remaining, planName, limit, currentCount }) {
   const { operatives, errors, unmapped, mappedFields = [] } = result;
-  const overflow = remaining !== null && operatives.length > remaining;
+  const blocked = remaining !== null && operatives.length > remaining;
 
   return (
     <div className="space-y-3 text-sm">
@@ -29,11 +30,13 @@ export default function BulkImportSummary({ result, remaining }) {
         </div>
       )}
 
-      {overflow && (
-        <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400">
-          <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-          <span>Your plan has room for {remaining} more operative{remaining === 1 ? '' : 's'}. Only the first {remaining} row{remaining === 1 ? '' : 's'} will be imported — upgrade your plan to add the rest.</span>
-        </div>
+      {blocked && (
+        <BulkImportBlockedNotice
+          planName={planName}
+          limit={limit}
+          currentCount={currentCount}
+          fileCount={operatives.length}
+        />
       )}
 
       {errors.length > 0 && (

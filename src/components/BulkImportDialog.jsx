@@ -6,7 +6,7 @@ import { Upload, Download, Loader2, FileSpreadsheet } from 'lucide-react';
 import { csvToOperatives, CSV_TEMPLATE } from '@/lib/csvParse';
 import BulkImportSummary from '@/components/BulkImportSummary';
 
-export default function BulkImportDialog({ open, onClose, accountId, remaining, onImported }) {
+export default function BulkImportDialog({ open, onClose, accountId, remaining, planName, limit, currentCount, onImported }) {
   const [fileName, setFileName] = useState('');
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
@@ -47,7 +47,7 @@ export default function BulkImportDialog({ open, onClose, accountId, remaining, 
     setImporting(true);
     setError('');
     try {
-      const toCreate = (remaining !== null ? result.operatives.slice(0, remaining) : result.operatives)
+      const toCreate = result.operatives
         .map((o) => ({ ...o, account_id: accountId, role: o.role || 'Scaffolder' }));
 
       await base44.entities.Operative.bulkCreate(toCreate);
@@ -62,7 +62,9 @@ export default function BulkImportDialog({ open, onClose, accountId, remaining, 
     }
   };
 
-  const canImport = result && result.operatives.length > 0 && remaining !== 0;
+  // Over the plan limit: block the whole import rather than partially importing
+  const blocked = !!result && remaining !== null && result.operatives.length > remaining;
+  const canImport = result && result.operatives.length > 0 && !blocked;
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
@@ -95,7 +97,15 @@ export default function BulkImportDialog({ open, onClose, accountId, remaining, 
             <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
           )}
 
-          {result && <BulkImportSummary result={result} remaining={remaining} />}
+          {result && (
+            <BulkImportSummary
+              result={result}
+              remaining={remaining}
+              planName={planName}
+              limit={limit}
+              currentCount={currentCount}
+            />
+          )}
         </div>
 
         <DialogFooter>
