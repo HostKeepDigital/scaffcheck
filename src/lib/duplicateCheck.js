@@ -10,12 +10,16 @@ const n = (v) => String(v || '').trim().toLowerCase();
 // Returns 'exact' | 'possible' | null
 function compare(a, b) {
   if (!n(a.full_name) || n(a.full_name) !== n(b.full_name)) return null;
-  const emailMatch = n(a.email) === n(b.email);
-  const phoneMatch = n(a.phone) === n(b.phone);
-  const hasContact = n(a.email) || n(a.phone) || n(b.email) || n(b.phone);
-  if (!hasContact) return 'possible';
-  if (emailMatch && phoneMatch) return 'exact';
-  return null;
+
+  let confirmed = false;
+  for (const field of ['email', 'phone']) {
+    const av = n(a[field]);
+    const bv = n(b[field]);
+    if (!av || !bv) continue; // blank on either side = no information
+    if (av !== bv) return null; // populated and different = different person
+    confirmed = true;
+  }
+  return confirmed ? 'exact' : 'possible';
 }
 
 // First non-identity field that differs, e.g. "role differs (A vs B)"
