@@ -28,6 +28,10 @@ Deno.serve(async (req) => {
       return_url: `${origin}/settings`,
     };
 
+    // Portal configuration that resets the billing cycle anchor on plan change
+    const configId = Deno.env.get('STRIPE_PORTAL_CONFIG_ID');
+    if (configId) params.configuration = configId;
+
     // Deep-link straight to the "change plan" screen when requested
     if (body?.flow === 'change_plan' && account.stripe_subscription_id) {
       params.flow_data = {
