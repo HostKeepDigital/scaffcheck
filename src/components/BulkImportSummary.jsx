@@ -12,20 +12,34 @@ const FIELD_LABELS = {
 };
 
 export default function BulkImportSummary({
-  result, duplicates = [], removedRows, onToggleRemove,
+  result, duplicates = [], validations = [], removedRows, onToggleRemove,
   keptCount, blocked, remaining, planName, limit, currentCount,
 }) {
   const { operatives, rowNumbers = [], errors, unmapped, mappedFields = [] } = result;
 
-  const kept = (i) => !removedRows.has(rowNumbers[i]);
+  const kept = (i) => !removedRows.has(rowNumbers[i]) && !validations[i]?.rejected;
   const exactCount = duplicates.filter((d, i) => d.status === 'exact' && kept(i)).length;
   const possibleCount = duplicates.filter((d, i) => d.status === 'possible' && kept(i)).length;
+
+  const rejectedCount = validations.filter((v) => v?.rejected).length;
+  const hasWarning = (i, text) => kept(i) && validations[i]?.warnings?.some((w) => w.startsWith(text));
+  const noEmailCount = validations.filter((v, i) => hasWarning(i, 'No email')).length;
+  const badEmailCount = validations.filter((v, i) => hasWarning(i, "Email doesn't look valid")).length;
+  const sharedEmailCount = validations.filter((v, i) => hasWarning(i, 'Shared email')).length;
+
+  const summaryLine = [
+    `${keptCount} operative${keptCount === 1 ? '' : 's'} ready to import`,
+    noEmailCount > 0 && `${noEmailCount} without email`,
+    badEmailCount > 0 && `${badEmailCount} with an invalid email`,
+    sharedEmailCount > 0 && `${sharedEmailCount} sharing an email address`,
+    rejectedCount > 0 && `${rejectedCount} row${rejectedCount === 1 ? '' : 's'} skipped (no name)`,
+  ].filter(Boolean).join(' · ');
 
   return (
     <div className="space-y-3 text-sm">
       <div className="flex items-start gap-2 text-foreground">
         <CheckCircle2 className="w-4 h-4 mt-0.5 text-green-600 dark:text-green-400 flex-shrink-0" />
-        <span><strong>{keptCount}</strong> operative{keptCount === 1 ? '' : 's'} ready to import.</span>
+        <span>{summaryLine}</span>
       </div>
 
       {mappedFields.length > 0 && (
@@ -85,7 +99,8 @@ export default function BulkImportSummary({
                   operative={o}
                   rowNumber={rowNumbers[i] ?? i}
                   dup={duplicates[i]}
-                  removed={!kept(i)}
+                  validation={validations[i]}
+                  removed={removedRows.has(rowNumbers[i])}
                   onToggleRemove={onToggleRemove}
                 />
               ))}

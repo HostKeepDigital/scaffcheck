@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Upload, Download, Loader2, FileSpreadsheet } from 'lucide-react';
-import { csvToOperatives, CSV_TEMPLATE } from '@/lib/csvParse';
+import { csvToOperatives, validateOperatives, CSV_TEMPLATE } from '@/lib/csvParse';
 import BulkImportSummary from '@/components/BulkImportSummary';
 
 export default function BulkImportDialog({ open, onClose, accountId, remaining, planName, limit, currentCount, existingOperatives = [], onImported }) {
@@ -22,8 +22,15 @@ export default function BulkImportDialog({ open, onClose, accountId, remaining, 
     [result, existingOperatives]
   );
 
+  const validations = useMemo(
+    () => (result ? validateOperatives(result.operatives) : []),
+    [result]
+  );
+
   const keptOperatives = result
-    ? result.operatives.filter((_, i) => !removedRows.has(result.rowNumbers[i]))
+    ? result.operatives.filter(
+        (_, i) => !removedRows.has(result.rowNumbers[i]) && !validations[i]?.rejected
+      )
     : [];
 
   const toggleRemove = (rowNumber) => {
@@ -122,6 +129,7 @@ export default function BulkImportDialog({ open, onClose, accountId, remaining, 
             <BulkImportSummary
               result={result}
               duplicates={duplicates}
+              validations={validations}
               removedRows={removedRows}
               onToggleRemove={toggleRemove}
               keptCount={keptOperatives.length}

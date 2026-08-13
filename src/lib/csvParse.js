@@ -83,19 +83,44 @@ export function csvToOperatives(text) {
       if (value) draft[field] = value;
     });
 
-    if (!draft.full_name) {
-      errors.push({ row: rowNum, message: 'Missing name — row skipped.' });
-      return;
-    }
-    if (draft.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(draft.email)) {
-      errors.push({ row: rowNum, message: `Invalid email for ${draft.full_name} — imported without it.` });
-      delete draft.email;
-    }
     operatives.push(draft);
     rowNumbers.push(rowNum);
   });
 
   return { operatives, rowNumbers, errors, unmapped, headers, mappedFields };
+}
+
+const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
+// Field validation. Rejected rows cannot be imported; warnings never block.
+// Returns [{ rejected, reason, warnings: [] }] aligned with operatives.
+export function validateOperatives(operatives) {
+  const byEmail = {};
+  operatives.forEach((o) => {
+    const key = String(o.email || '').trim().toLowerCase();
+    if (!key) return;
+    (byEmail[key] = byEmail[key] || []).push(String(o.full_name || '').trim());
+  });
+
+  return operatives.map((o) => {
+    if (!String(o.full_name || '').trim()) {
+      return { rejected: true, reason: 'No name — this row cannot be imported', warnings: [] };
+    }
+    const warnings = [];
+    const email = String(o.email || '').trim();
+    if (!email) {
+      warnings.push("No email — you won't be able to send this operative an upload link.");
+    } else if (!EMAIL_RE.test(email)) {
+      warnings.push("Email doesn't look valid — invites may not arrive.");
+    }
+    const sharers = (byEmail[email.toLowerCase()] || []).filter(
+      (name) => name.toLowerCase() !== String(o.full_name).trim().toLowerCase()
+    );
+    if (email && sharers.length > 0) {
+      warnings.push(`Shared email — this address is also used by ${[...new Set(sharers)].join(', ')}.`);
+    }
+    return { rejected: false, reason: '', warnings };
+  });
 }
 
 export const CSV_TEMPLATE =

@@ -5,17 +5,20 @@ const DUP_STYLES = {
   possible: 'bg-amber-400/10',
 };
 
-export default function BulkImportRow({ operative, rowNumber, dup, removed, onToggleRemove }) {
+export default function BulkImportRow({ operative, rowNumber, dup, validation, removed, onToggleRemove }) {
+  const rejected = !!validation?.rejected;
   const rowCls = removed
     ? 'opacity-40 line-through'
-    : dup?.status
-      ? DUP_STYLES[dup.status]
-      : '';
+    : rejected
+      ? 'opacity-40'
+      : dup?.status
+        ? DUP_STYLES[dup.status]
+        : '';
 
   return (
     <tr className={`border-t border-border ${rowCls}`}>
       <td className="px-3 py-2 font-medium align-top">
-        {operative.full_name}
+        {operative.full_name || <span className="text-muted-foreground italic font-normal">No name</span>}
         {dup?.status === 'exact' && (
           <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-yellow-500/25 text-yellow-800 dark:text-yellow-300 whitespace-nowrap">
             Duplicate
@@ -26,15 +29,22 @@ export default function BulkImportRow({ operative, rowNumber, dup, removed, onTo
             Possible duplicate
           </span>
         )}
-        {dup?.detail && (
+        {dup?.detail && !rejected && (
           <p className="mt-0.5 text-[10px] font-normal text-muted-foreground">{dup.detail}</p>
         )}
+        {rejected && (
+          <p className="mt-0.5 text-[10px] font-normal text-muted-foreground">{validation.reason}</p>
+        )}
+        {!rejected && validation?.warnings?.map((w, i) => (
+          <p key={i} className="mt-0.5 text-[10px] font-normal text-muted-foreground">{w}</p>
+        ))}
       </td>
       <td className="px-3 py-2 text-muted-foreground align-top">{operative.company_name || '—'}</td>
       <td className="px-3 py-2 text-muted-foreground align-top">{operative.role || 'Scaffolder'}</td>
       <td className="px-2 py-2 align-top text-right">
         <button
           type="button"
+          disabled={rejected}
           onClick={() => onToggleRemove(rowNumber)}
           title={removed ? 'Put this row back in the import' : 'Remove this row from the import'}
           className="p-1 rounded hover:bg-muted"
