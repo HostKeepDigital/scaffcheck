@@ -1,4 +1,5 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
+import { detectDuplicates } from '@/lib/duplicateCheck';
 import { base44 } from '@/api/base44Client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -6,14 +7,33 @@ import { Upload, Download, Loader2, FileSpreadsheet } from 'lucide-react';
 import { csvToOperatives, CSV_TEMPLATE } from '@/lib/csvParse';
 import BulkImportSummary from '@/components/BulkImportSummary';
 
-export default function BulkImportDialog({ open, onClose, accountId, remaining, planName, limit, currentCount, onImported }) {
+export default function BulkImportDialog({ open, onClose, accountId, remaining, planName, limit, currentCount, existingOperatives = [], onImported }) {
   const [fileName, setFileName] = useState('');
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
   const [importing, setImporting] = useState(false);
+  const [removedRows, setRemovedRows] = useState(new Set());
   const inputRef = useRef(null);
 
-  const reset = () => { setFileName(''); setResult(null); setError(''); setImporting(false); };
+  const reset = () => { setFileName(''); setResult(null); setError(''); setImporting(false); setRemovedRows(new Set()); };
+
+  const duplicates = useMemo(
+    () => (result ? detectDuplicates(result.operatives, existingOperatives) : []),
+    [result, existingOperatives]
+  );
+
+  const keptOperatives = result
+    ? result.operatives.filter((_, i) => !removedRows.has(result.rowNumbers[i]))
+    : [];
+
+  const toggleRemove = (rowNumber) => {
+    setRemovedRows((prev) => {
+      const next = new Set(prev);
+      if (next.has(rowNumber)) next.delete(rowNumber);
+      else next.add(rowNumber);
+      return next;
+    });
+  };
 
   const handleClose = () => { reset(); onClose(); };
 
@@ -29,6 +49,7 @@ export default function BulkImportDialog({ open, onClose, accountId, remaining, 
       setResult(null);
       return;
     }
+    setRemovedRows(new Set());
     setResult(parsed);
   };
 
@@ -43,11 +64,11 @@ export default function BulkImportDialog({ open, onClose, accountId, remaining, 
   };
 
   const handleImport = async () => {
-    if (!result || result.operatives.length === 0) return;
+    if (keptOperatives.length === 0) return;
     setImporting(true);
     setError('');
     try {
-      const toCreate = result.operatives
+      const toCreate = keptOperatives
         .map((o) => ({ ...o, account_id: accountId, role: o.role || 'Scaffolder' }));
 
       await base44.entities.Operative.bulkCreate(toCreate);
@@ -63,8 +84,8 @@ export default function BulkImportDialog({ open, onClose, accountId, remaining, 
   };
 
   // Over the plan limit: block the whole import rather than partially importing
-  const blocked = !!result && remaining !== null && result.operatives.length > remaining;
-  const canImport = result && result.operatives.length > 0 && !blocked;
+  const blocked = !!result && remaining !== null && keptOperatives.length > remaining;
+  const canImport = keptOperatives.length > 0 && !blocked;
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
@@ -100,6 +121,11 @@ export default function BulkImportDialog({ open, onClose, accountId, remaining, 
           {result && (
             <BulkImportSummary
               result={result}
+              duplicates={duplicates}
+              removedRows={removedRows}
+              onToggleRemove={toggleRemove}
+              keptCount={keptOperatives.length}
+              blocked={blocked}
               remaining={remaining}
               planName={planName}
               limit={limit}

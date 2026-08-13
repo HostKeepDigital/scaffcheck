@@ -72,8 +72,8 @@ export function csvToOperatives(text) {
   }
 
   const operatives = [];
+  const rowNumbers = [];
   const errors = [];
-  const seen = new Set();
 
   rows.slice(1).forEach((cells, idx) => {
     const rowNum = idx + 2;
@@ -87,20 +87,15 @@ export function csvToOperatives(text) {
       errors.push({ row: rowNum, message: 'Missing name — row skipped.' });
       return;
     }
-    const key = draft.full_name.toLowerCase();
-    if (seen.has(key)) {
-      errors.push({ row: rowNum, message: `Duplicate of "${draft.full_name}" in this file — row skipped.` });
-      return;
-    }
-    seen.add(key);
     if (draft.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(draft.email)) {
       errors.push({ row: rowNum, message: `Invalid email for ${draft.full_name} — imported without it.` });
       delete draft.email;
     }
     operatives.push(draft);
+    rowNumbers.push(rowNum);
   });
 
-  return { operatives, errors, unmapped, headers, mappedFields };
+  return { operatives, rowNumbers, errors, unmapped, headers, mappedFields };
 }
 
 export const CSV_TEMPLATE =

@@ -1,5 +1,6 @@
-import { CheckCircle2, AlertTriangle, Info } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, Info, Copy } from 'lucide-react';
 import BulkImportBlockedNotice from '@/components/BulkImportBlockedNotice';
+import BulkImportRow from '@/components/BulkImportRow';
 
 const FIELD_LABELS = {
   full_name: 'Name',
@@ -10,15 +11,21 @@ const FIELD_LABELS = {
   notes: 'Notes',
 };
 
-export default function BulkImportSummary({ result, remaining, planName, limit, currentCount }) {
-  const { operatives, errors, unmapped, mappedFields = [] } = result;
-  const blocked = remaining !== null && operatives.length > remaining;
+export default function BulkImportSummary({
+  result, duplicates = [], removedRows, onToggleRemove,
+  keptCount, blocked, remaining, planName, limit, currentCount,
+}) {
+  const { operatives, rowNumbers = [], errors, unmapped, mappedFields = [] } = result;
+
+  const kept = (i) => !removedRows.has(rowNumbers[i]);
+  const exactCount = duplicates.filter((d, i) => d.status === 'exact' && kept(i)).length;
+  const possibleCount = duplicates.filter((d, i) => d.status === 'possible' && kept(i)).length;
 
   return (
     <div className="space-y-3 text-sm">
       <div className="flex items-start gap-2 text-foreground">
         <CheckCircle2 className="w-4 h-4 mt-0.5 text-green-600 dark:text-green-400 flex-shrink-0" />
-        <span><strong>{operatives.length}</strong> operative{operatives.length === 1 ? '' : 's'} ready to import.</span>
+        <span><strong>{keptCount}</strong> operative{keptCount === 1 ? '' : 's'} ready to import.</span>
       </div>
 
       {mappedFields.length > 0 && (
@@ -35,7 +42,7 @@ export default function BulkImportSummary({ result, remaining, planName, limit, 
           planName={planName}
           limit={limit}
           currentCount={currentCount}
-          fileCount={operatives.length}
+          fileCount={keptCount}
         />
       )}
 
@@ -48,29 +55,42 @@ export default function BulkImportSummary({ result, remaining, planName, limit, 
         </div>
       )}
 
+      {(exactCount > 0 || possibleCount > 0) && (
+        <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400">
+          <Copy className="w-4 h-4 mt-0.5 flex-shrink-0" />
+          <span>
+            {[
+              exactCount > 0 && `${exactCount} duplicate${exactCount === 1 ? '' : 's'}`,
+              possibleCount > 0 && `${possibleCount} possible duplicate${possibleCount === 1 ? '' : 's'}`,
+            ].filter(Boolean).join(' and ')} found — review before importing. Nothing is removed unless you remove it.
+          </span>
+        </div>
+      )}
+
       {operatives.length > 0 && (
-        <div className="border border-border rounded-lg overflow-hidden">
+        <div className="border border-border rounded-lg overflow-hidden max-h-72 overflow-y-auto">
           <table className="w-full text-xs">
-            <thead className="bg-muted/50">
+            <thead className="bg-muted/50 sticky top-0">
               <tr>
                 <th className="text-left px-3 py-2 font-semibold text-muted-foreground">Name</th>
                 <th className="text-left px-3 py-2 font-semibold text-muted-foreground">Company</th>
                 <th className="text-left px-3 py-2 font-semibold text-muted-foreground">Role</th>
+                <th className="w-8"></th>
               </tr>
             </thead>
             <tbody>
-              {operatives.slice(0, 5).map((o, i) => (
-                <tr key={i} className="border-t border-border">
-                  <td className="px-3 py-2 font-medium">{o.full_name}</td>
-                  <td className="px-3 py-2 text-muted-foreground">{o.company_name || '—'}</td>
-                  <td className="px-3 py-2 text-muted-foreground">{o.role || 'Scaffolder'}</td>
-                </tr>
+              {operatives.map((o, i) => (
+                <BulkImportRow
+                  key={rowNumbers[i] ?? i}
+                  operative={o}
+                  rowNumber={rowNumbers[i] ?? i}
+                  dup={duplicates[i]}
+                  removed={!kept(i)}
+                  onToggleRemove={onToggleRemove}
+                />
               ))}
             </tbody>
           </table>
-          {operatives.length > 5 && (
-            <p className="px-3 py-2 text-xs text-muted-foreground bg-muted/30">+ {operatives.length - 5} more</p>
-          )}
         </div>
       )}
 

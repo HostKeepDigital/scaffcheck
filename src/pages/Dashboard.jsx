@@ -252,6 +252,7 @@ export default function Dashboard() {
         planName={PLANS.find((p) => p.id === account?.plan)?.name || 'current'}
         limit={limit}
         currentCount={account?.operative_count ?? operatives.length}
+        existingOperatives={operatives}
         onImported={loadData}
       />
     </div>
