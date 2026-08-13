@@ -23,6 +23,16 @@ export default function BillingSummaryCard({ account, onManage, busy, ragCounts 
   const renewalDate = isTrial ? account.trial_ends_at : account.current_period_end;
   const cycleWord = billing === 'annual' ? 'year' : 'month';
 
+  // Scheduled (deferred) change — e.g. a downgrade that starts at the next renewal
+  const pendingPlanId = account.pending_plan || account.plan;
+  const pendingBilling = account.pending_billing === 'annual' ? 'annual'
+    : account.pending_billing === 'monthly' ? 'monthly' : billing;
+  const hasPending =
+    (!!account.pending_plan || !!account.pending_billing) &&
+    (pendingPlanId !== account.plan || pendingBilling !== billing);
+  const pendingPlan = PLANS.find((p) => p.id === pendingPlanId) || plan;
+  const pendingCycleWord = pendingBilling === 'annual' ? 'year' : 'month';
+
   return (
     <Card>
       <CardContent className="p-0">
@@ -64,7 +74,16 @@ export default function BillingSummaryCard({ account, onManage, busy, ragCounts 
             <span className="flex items-center gap-2 text-muted-foreground">
               <Repeat className="w-4 h-4" /> Billing cycle
             </span>
-            <span className="font-semibold text-foreground capitalize">{billing}</span>
+            <span className="font-semibold text-foreground text-right">
+              <span className="capitalize">{billing}</span>
+              {hasPending && (
+                <span className="font-normal text-muted-foreground">
+                  {' → '}switching to <span className="capitalize">{pendingBilling}</span>
+                  {pendingPlan.id !== plan.id && ` (${pendingPlan.name})`}
+                  {renewalDate && ` on ${fmtDate(renewalDate)}`}
+                </span>
+              )}
+            </span>
           </div>
           {billing === 'monthly' && annualSaving(plan) > 0 && (
             <p className="text-xs text-green-600 dark:text-green-400">
@@ -84,10 +103,15 @@ export default function BillingSummaryCard({ account, onManage, busy, ragCounts 
               <Receipt className="w-4 h-4" /> {isTrial ? 'Amount at first payment' : 'Amount at renewal'}
             </span>
             <span className="font-semibold text-foreground text-right">
-              {plan[billing].priceLabel}{' '}
-              <span className="font-normal text-muted-foreground">per {cycleWord}</span>
+              {hasPending ? pendingPlan[pendingBilling].priceLabel : plan[billing].priceLabel}{' '}
+              <span className="font-normal text-muted-foreground">
+                per {hasPending ? pendingCycleWord : cycleWord}
+              </span>
             </span>
           </div>
+          {hasPending && (
+            <p className="text-xs text-muted-foreground">You'll keep your current plan until then.</p>
+          )}
           {isTrial && (
             <p className="text-xs text-muted-foreground">
               Your free trial runs until then. You won't be charged before that date, and your {plan.name}{' '}

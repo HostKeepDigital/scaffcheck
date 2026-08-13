@@ -51,6 +51,21 @@
       ],
       "default": "monthly"
     },
+    "pending_plan": {
+      "type": "string",
+      "enum": [
+        "crew",
+        "contractor",
+        "firm"
+      ]
+    },
+    "pending_billing": {
+      "type": "string",
+      "enum": [
+        "monthly",
+        "annual"
+      ]
+    },
     "operative_count": {
       "type": "integer",
       "default": 0

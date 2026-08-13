@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
           } else if (subscription.status === 'trialing') {
             status = 'trial_active';
           }
-          const updates: Record<string, string> = { subscription_status: status };
+          const updates: Record<string, unknown> = { subscription_status: status };
           const item = subscription.items?.data?.[0];
           // Newer Stripe API versions expose the period end on the subscription item
           const periodEnd = item?.current_period_end ?? subscription.current_period_end;
@@ -89,6 +89,29 @@ Deno.serve(async (req) => {
           if (matched) {
             updates.plan = matched.plan;
             updates.billing = matched.billing;
+          }
+          // Scheduled (deferred) plan change — e.g. a downgrade at period end
+          updates.pending_plan = null;
+          updates.pending_billing = null;
+          try {
+            if (subscription.schedule) {
+              const scheduleId = typeof subscription.schedule === 'string'
+                ? subscription.schedule
+                : subscription.schedule.id;
+              const schedule = await stripe.subscriptionSchedules.retrieve(scheduleId);
+              const futurePhase = (schedule.phases || []).find(
+                (p) => periodEnd && p.start_date >= periodEnd
+              );
+              const futurePrice = futurePhase?.items?.[0]?.price;
+              const futurePriceId = typeof futurePrice === 'string' ? futurePrice : futurePrice?.id;
+              const futureMatch = futurePriceId ? planFromPriceId(futurePriceId) : undefined;
+              if (futureMatch) {
+                updates.pending_plan = futureMatch.plan;
+                updates.pending_billing = futureMatch.billing;
+              }
+            }
+          } catch (scheduleErr) {
+            console.error('Subscription schedule lookup failed:', scheduleErr.message);
           }
           await base44.asServiceRole.entities.Account.update(accounts[0].id, updates);
         }
