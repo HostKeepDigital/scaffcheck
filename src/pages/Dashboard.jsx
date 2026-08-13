@@ -189,14 +189,14 @@ export default function Dashboard() {
             ) : (
             <>
             {/* Desktop table */}
-            <div className="hidden sm:block bg-card rounded-xl border border-border overflow-hidden">
+            <div className="hidden sm:block bg-card rounded-xl border border-border">
               <table className="w-full">
-                <thead className="sticky top-14 z-10">
-                  <tr className="border-b border-border bg-muted">
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Name</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Company</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Status</th>
-                    <th className="w-10 bg-muted"></th>
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="sticky top-14 z-20 bg-muted rounded-tl-xl text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Name</th>
+                    <th className="sticky top-14 z-20 bg-muted text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Company</th>
+                    <th className="sticky top-14 z-20 bg-muted text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Status</th>
+                    <th className="sticky top-14 z-20 bg-muted rounded-tr-xl w-10"></th>
                   </tr>
                 </thead>
                 <tbody>
