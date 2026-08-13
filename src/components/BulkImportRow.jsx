@@ -17,20 +17,17 @@ export default function BulkImportRow({ operative, rowNumber, dup, removed, onTo
       <td className="px-3 py-2 font-medium align-top">
         {operative.full_name}
         {dup?.status === 'exact' && (
-          <span
-            className="ml-2 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-yellow-500/25 text-yellow-800 dark:text-yellow-300 whitespace-nowrap"
-            title={`Matches ${dup.reason}`}
-          >
+          <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-yellow-500/25 text-yellow-800 dark:text-yellow-300 whitespace-nowrap">
             Duplicate
           </span>
         )}
         {dup?.status === 'possible' && (
-          <span
-            className="ml-2 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/15 text-amber-700 dark:text-amber-400"
-            title={`Same name as ${dup.reason}`}
-          >
-            Possible duplicate — same name, no matching contact details
+          <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/15 text-amber-700 dark:text-amber-400 whitespace-nowrap">
+            Possible duplicate
           </span>
+        )}
+        {dup?.detail && (
+          <p className="mt-0.5 text-[10px] font-normal text-muted-foreground">{dup.detail}</p>
         )}
       </td>
       <td className="px-3 py-2 text-muted-foreground align-top">{operative.company_name || '—'}</td>

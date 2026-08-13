@@ -18,7 +18,7 @@ export default function BulkImportDialog({ open, onClose, accountId, remaining, 
   const reset = () => { setFileName(''); setResult(null); setError(''); setImporting(false); setRemovedRows(new Set()); };
 
   const duplicates = useMemo(
-    () => (result ? detectDuplicates(result.operatives, existingOperatives) : []),
+    () => (result ? detectDuplicates(result.operatives, existingOperatives, result.rowNumbers) : []),
     [result, existingOperatives]
   );
 
