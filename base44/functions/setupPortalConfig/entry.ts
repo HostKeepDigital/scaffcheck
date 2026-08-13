@@ -40,6 +40,13 @@ export default async function (req: Request): Promise<Response> {
           default_allowed_updates: ['price'],
           proration_behavior: 'create_prorations',
           billing_cycle_anchor: 'now',
+          // Defer downgrades (cheaper price, or annual -> monthly) to period end
+          schedule_at_period_end: {
+            conditions: [
+              { type: 'decreasing_item_amount' },
+              { type: 'shortening_interval' },
+            ],
+          },
           products,
         },
       },
