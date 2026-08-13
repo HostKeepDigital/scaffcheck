@@ -48,6 +48,8 @@ function contactGaps(a, b) {
   return notes;
 }
 
+const contactCount = (r) => ['email', 'phone'].filter((f) => n(r[f])).length;
+
 // rows: parsed drafts, existing: account's current operatives, rowNumbers: CSV row numbers.
 // Returns [{ status, detail }] aligned with rows.
 export function detectDuplicates(rows, existing = [], rowNumbers = []) {
@@ -55,12 +57,18 @@ export function detectDuplicates(rows, existing = [], rowNumbers = []) {
     let status = null;
     let detail = '';
 
-    const consider = (result, other, label, sameLabel) => {
+    const consider = (result, other, label, sameLabel, otherRowRef = null) => {
       if (!result) return;
       if (result === 'exact' && status !== 'exact') {
         const parts = [attributeDiff(row, other), ...contactGaps(row, other)].filter(Boolean);
         status = 'exact';
         detail = parts.length ? `${label} — ${parts.join(', ')}` : sameLabel;
+        if (otherRowRef !== null) {
+          const mine = contactCount(row);
+          const theirs = contactCount(other);
+          if (mine < theirs) detail += `. Row ${otherRowRef} has more complete details — we'd keep that one.`;
+          else if (mine > theirs) detail += `. Recommended — more complete than row ${otherRowRef}.`;
+        }
       } else if (!status) {
         status = 'possible';
         detail = 'Same name, no matching contact details';
@@ -70,7 +78,7 @@ export function detectDuplicates(rows, existing = [], rowNumbers = []) {
     rows.forEach((other, j) => {
       if (i === j) return;
       const rowRef = rowNumbers[j] ?? j + 2;
-      consider(compare(row, other), other, `Same person as row ${rowRef}`, `Identical to row ${rowRef}`);
+      consider(compare(row, other), other, `Same person as row ${rowRef}`, `Identical to row ${rowRef}`, rowRef);
     });
     existing.forEach((op) =>
       consider(compare(row, op), op, 'Matches an existing operative', 'Matches an existing operative')
