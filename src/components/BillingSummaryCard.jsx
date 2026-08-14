@@ -33,6 +33,13 @@ export default function BillingSummaryCard({ account, onManage, busy, ragCounts 
   const pendingPlan = PLANS.find((p) => p.id === pendingPlanId) || plan;
   const pendingCycleWord = pendingBilling === 'annual' ? 'year' : 'month';
 
+  // Scheduled cancellation
+  const isCancelling = !!account.cancel_at_period_end && account.subscription_status !== 'lapsed';
+  const cancelDate = account.cancel_at || (isTrial ? account.trial_ends_at : account.current_period_end);
+  const badge = isCancelling
+    ? { label: 'Cancelled', cls: 'bg-red-500/15 text-red-600 dark:text-red-400 border-red-500/30' }
+    : status;
+
   return (
     <Card>
       <CardContent className="p-0">
@@ -45,8 +52,8 @@ export default function BillingSummaryCard({ account, onManage, busy, ragCounts 
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-2xl font-bold text-foreground">{plan.name}</span>
-                <span className={`px-2 py-0.5 rounded-full border text-[11px] font-semibold ${status.cls}`}>
-                  {status.label}
+                <span className={`px-2 py-0.5 rounded-full border text-[11px] font-semibold ${badge.cls}`}>
+                  {badge.label}
                 </span>
               </div>
               <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
@@ -75,8 +82,8 @@ export default function BillingSummaryCard({ account, onManage, busy, ragCounts 
               <Repeat className="w-4 h-4" /> Billing cycle
             </span>
             <span className="font-semibold text-foreground text-right">
-              <span className="capitalize">{billing}</span>
-              {hasPending && (
+              {isCancelling ? 'Cancelled' : <span className="capitalize">{billing}</span>}
+              {!isCancelling && hasPending && (
                 <span className="font-normal text-muted-foreground">
                   {' → '}switching to <span className="capitalize">{pendingBilling}</span>
                   {pendingPlan.id !== plan.id && ` (${pendingPlan.name})`}
@@ -85,34 +92,45 @@ export default function BillingSummaryCard({ account, onManage, busy, ragCounts 
               )}
             </span>
           </div>
-          {billing === 'monthly' && annualSaving(plan) > 0 && (
+          {!isCancelling && billing === 'monthly' && annualSaving(plan) > 0 && (
             <p className="text-xs text-green-600 dark:text-green-400">
               Switch to annual billing and save £{annualSaving(plan)} a year.
             </p>
           )}
-          {renewalDate && (
+          {(isCancelling ? cancelDate : renewalDate) && (
             <div className="flex items-start justify-between gap-4">
               <span className="flex items-center gap-2 text-muted-foreground">
-                <CalendarClock className="w-4 h-4" /> {isTrial ? 'First payment due' : 'Next renewal due'}
+                <CalendarClock className="w-4 h-4" />{' '}
+                {isCancelling ? 'Expiry date' : isTrial ? 'First payment due' : 'Next renewal due'}
               </span>
-              <span className="font-semibold text-foreground text-right">{fmtDate(renewalDate)}</span>
+              <span className="font-semibold text-foreground text-right">
+                {fmtDate(isCancelling ? cancelDate : renewalDate)}
+              </span>
             </div>
           )}
-          <div className="flex items-start justify-between gap-4">
-            <span className="flex items-center gap-2 text-muted-foreground">
-              <Receipt className="w-4 h-4" /> {isTrial ? 'Amount at first payment' : 'Amount at renewal'}
-            </span>
-            <span className="font-semibold text-foreground text-right">
-              {hasPending ? pendingPlan[pendingBilling].priceLabel : plan[billing].priceLabel}{' '}
-              <span className="font-normal text-muted-foreground">
-                per {hasPending ? pendingCycleWord : cycleWord}
+          {!isCancelling && (
+            <div className="flex items-start justify-between gap-4">
+              <span className="flex items-center gap-2 text-muted-foreground">
+                <Receipt className="w-4 h-4" /> {isTrial ? 'Amount at first payment' : 'Amount at renewal'}
               </span>
-            </span>
-          </div>
+              <span className="font-semibold text-foreground text-right">
+                {hasPending ? pendingPlan[pendingBilling].priceLabel : plan[billing].priceLabel}{' '}
+                <span className="font-normal text-muted-foreground">
+                  per {hasPending ? pendingCycleWord : cycleWord}
+                </span>
+              </span>
+            </div>
+          )}
           {hasPending && (
             <p className="text-xs text-muted-foreground">You'll keep your current plan until then.</p>
           )}
-          {isTrial && (
+          {isCancelling ? (
+            <p className="text-xs text-muted-foreground">
+              {isTrial
+                ? `Your free trial ends on ${fmtDate(cancelDate)} and no payment will be taken. Would you like to continue your membership?`
+                : `Your subscription is cancelled. Access ends on ${fmtDate(cancelDate)}. Would you like to continue your membership?`}
+            </p>
+          ) : isTrial && (
             <p className="text-xs text-muted-foreground">
               Your free trial runs until then. You won't be charged before that date, and your {plan.name}{' '}
               subscription starts automatically afterwards unless you cancel.
@@ -132,22 +150,28 @@ export default function BillingSummaryCard({ account, onManage, busy, ragCounts 
 
         {/* Actions */}
         <div className="p-5 space-y-3">
-          <div className="space-y-1">
-            {isTrial && (
-              <p className="text-xs text-muted-foreground">Changing plan won't affect your free trial.</p>
-            )}
-            <p className="text-xs text-muted-foreground">
-              {isTrial ? 'Post-trial, upgrades' : 'Upgrades'} apply straight away and you're charged only the difference
-              for the rest of the period; downgrades start at your next renewal.
-            </p>
-          </div>
+          {!isCancelling && (
+            <div className="space-y-1">
+              {isTrial && (
+                <p className="text-xs text-muted-foreground">Changing plan won't affect your free trial.</p>
+              )}
+              <p className="text-xs text-muted-foreground">
+                {isTrial ? 'Post-trial, upgrades' : 'Upgrades'} apply straight away and you're charged only the difference
+                for the rest of the period; downgrades start at your next renewal.
+              </p>
+            </div>
+          )}
           <Button
             className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold h-11"
             onClick={onManage}
             disabled={busy}
           >
             {busy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ArrowUpRight className="w-4 h-4 mr-2" />}
-            {isTrial ? 'Manage billing & invoices' : <>Manage subscription &amp; billing</>}
+            {isCancelling
+              ? 'Continue membership'
+              : isTrial
+                ? 'Manage billing & invoices'
+                : <>Manage subscription &amp; billing</>}
           </Button>
           <DowngradeLimitNotice operativeCount={account.operative_count || 0} />
         </div>
