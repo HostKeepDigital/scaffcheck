@@ -52,6 +52,8 @@ Deno.serve(async (req) => {
           plan,
           billing,
           has_used_trial: true,
+          cancel_at_period_end: false,
+          cancel_at: null,
         };
 
         const existing = await base44.asServiceRole.entities.Account.filter({ owner_user_id: userId });
@@ -140,6 +142,8 @@ Deno.serve(async (req) => {
         if (accounts && accounts.length > 0) {
           await base44.asServiceRole.entities.Account.update(accounts[0].id, {
             subscription_status: 'lapsed',
+            cancel_at_period_end: false,
+            cancel_at: null,
           });
         }
         break;
