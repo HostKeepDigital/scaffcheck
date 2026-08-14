@@ -28,19 +28,23 @@ export default async function (req: Request): Promise<Response> {
 
     const products = Object.entries(byProduct).map(([product, prices]) => ({ product, prices }));
 
-    const config = await stripe.billingPortal.configurations.create({
+    const baseFeatures = {
+      customer_update: { enabled: true, allowed_updates: ['email', 'address', 'name', 'tax_id'] },
+      invoice_history: { enabled: true },
+      payment_method_update: { enabled: true },
+      subscription_cancel: { enabled: true, mode: 'at_period_end' },
+    };
+
+    // Deferred config — downgrades scheduled to period end. Used for paying customers.
+    const deferredConfig = await stripe.billingPortal.configurations.create({
       business_profile: { headline: 'ScaffKeep subscription' },
       features: {
-        customer_update: { enabled: true, allowed_updates: ['email', 'address', 'name', 'tax_id'] },
-        invoice_history: { enabled: true },
-        payment_method_update: { enabled: true },
-        subscription_cancel: { enabled: true, mode: 'at_period_end' },
+        ...baseFeatures,
         subscription_update: {
           enabled: true,
           default_allowed_updates: ['price'],
           proration_behavior: 'create_prorations',
           billing_cycle_anchor: 'now',
-          // Defer downgrades (cheaper price, or annual -> monthly) to period end
           schedule_at_period_end: {
             conditions: [
               { type: 'decreasing_item_amount' },
@@ -52,7 +56,27 @@ export default async function (req: Request): Promise<Response> {
       },
     });
 
-    return Response.json({ configuration_id: config.id, products });
+    // Immediate config — no schedule_at_period_end, so downgrades apply at once.
+    // Used ONLY for trial customers, where nothing is charged until the trial ends.
+    const immediateConfig = await stripe.billingPortal.configurations.create({
+      business_profile: { headline: 'ScaffKeep subscription' },
+      features: {
+        ...baseFeatures,
+        subscription_update: {
+          enabled: true,
+          default_allowed_updates: ['price'],
+          proration_behavior: 'create_prorations',
+          billing_cycle_anchor: 'now',
+          products,
+        },
+      },
+    });
+
+    return Response.json({
+      deferred_configuration_id: deferredConfig.id,
+      immediate_configuration_id: immediateConfig.id,
+      products,
+    });
   } catch (error) {
     console.error('setupPortalConfig error:', error);
     return Response.json({ error: error.message }, { status: 500 });
