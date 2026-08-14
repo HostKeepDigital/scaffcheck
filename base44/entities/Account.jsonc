@@ -66,6 +66,14 @@
         "annual"
       ]
     },
+    "cancel_at_period_end": {
+      "type": "boolean",
+      "default": false
+    },
+    "cancel_at": {
+      "type": "string",
+      "format": "date-time"
+    },
     "operative_count": {
       "type": "integer",
       "default": 0

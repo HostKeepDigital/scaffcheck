@@ -93,6 +93,10 @@ Deno.serve(async (req) => {
           // Scheduled (deferred) plan change — e.g. a downgrade at period end
           updates.pending_plan = null;
           updates.pending_billing = null;
+          updates.cancel_at_period_end = !!subscription.cancel_at_period_end;
+          updates.cancel_at = subscription.cancel_at
+            ? new Date(subscription.cancel_at * 1000).toISOString()
+            : null;
           try {
             if (subscription.schedule) {
               const scheduleId = typeof subscription.schedule === 'string'
