@@ -28,8 +28,14 @@ Deno.serve(async (req) => {
       return_url: `${origin}/settings`,
     };
 
-    // Portal configuration that resets the billing cycle anchor on plan change
-    const configId = Deno.env.get('STRIPE_PORTAL_CONFIG_ID');
+    // Trial customers get the immediate config (downgrades apply now, so their operative
+    // limit drops at the point of change); paying customers get the deferred config
+    // (downgrades scheduled to period end). Fall back to the deferred config if the trial
+    // one isn't set, and to Stripe's default if neither is.
+    const deferredConfigId = Deno.env.get('STRIPE_PORTAL_CONFIG_ID');
+    const trialConfigId = Deno.env.get('STRIPE_PORTAL_CONFIG_ID_TRIAL');
+    const isTrial = account.subscription_status === 'trial_active';
+    const configId = (isTrial && trialConfigId) ? trialConfigId : deferredConfigId;
     if (configId) params.configuration = configId;
 
     // Deep-link straight to the "change plan" screen when requested
