@@ -22,12 +22,13 @@ Deno.serve(async (req) => {
     const existing = await base44.asServiceRole.entities.Account.filter({ owner_user_id: user_id });
     const existingAccount = existing && existing.length > 0 ? existing[0] : null;
     const customerId = existingAccount?.stripe_customer_id;
+    const hasUsedTrial = !!existingAccount?.has_used_trial;
 
     const sessionParams = {
       mode: 'subscription',
       line_items: [{ price, quantity: 1 }],
       subscription_data: {
-        trial_period_days: 7,
+        ...(hasUsedTrial ? {} : { trial_period_days: 7 }),
         metadata: {
           user_id,
           company_name: company_name || '',

@@ -29,31 +29,41 @@ Deno.serve(async (req) => {
         const plan = session.metadata?.plan;
         const billing = session.metadata?.billing || 'monthly';
 
-        const trialEnd = new Date();
-        trialEnd.setDate(trialEnd.getDate() + 7);
+        let subStatus = 'active';
+        let trialEndsAt = null;
+        let periodEnd = null;
+        if (session.subscription) {
+          const sub = await stripe.subscriptions.retrieve(session.subscription);
+          if (sub.status === 'trialing') subStatus = 'trial_active';
+          else if (['past_due', 'unpaid', 'canceled', 'incomplete_expired'].includes(sub.status)) subStatus = 'lapsed';
+          else subStatus = 'active';
+          if (sub.trial_end) trialEndsAt = new Date(sub.trial_end * 1000).toISOString();
+          const item = sub.items?.data?.[0];
+          const pe = item?.current_period_end ?? sub.current_period_end;
+          if (pe) periodEnd = new Date(pe * 1000).toISOString();
+        }
+
+        const fields = {
+          subscription_status: subStatus,
+          trial_ends_at: trialEndsAt,
+          current_period_end: periodEnd,
+          stripe_customer_id: session.customer,
+          stripe_subscription_id: session.subscription,
+          plan,
+          billing,
+          has_used_trial: true,
+        };
 
         const existing = await base44.asServiceRole.entities.Account.filter({ owner_user_id: userId });
         let accountId;
         if (existing && existing.length > 0) {
           accountId = existing[0].id;
-          await base44.asServiceRole.entities.Account.update(accountId, {
-            subscription_status: 'trial_active',
-            trial_ends_at: trialEnd.toISOString(),
-            stripe_customer_id: session.customer,
-            stripe_subscription_id: session.subscription,
-            plan,
-            billing,
-          });
+          await base44.asServiceRole.entities.Account.update(accountId, fields);
         } else {
           const newAccount = await base44.asServiceRole.entities.Account.create({
+            ...fields,
             company_name: companyName,
             owner_user_id: userId,
-            subscription_status: 'trial_active',
-            trial_ends_at: trialEnd.toISOString(),
-            stripe_customer_id: session.customer,
-            stripe_subscription_id: session.subscription,
-            plan,
-            billing,
             operative_count: 0,
           });
           accountId = newAccount.id;
