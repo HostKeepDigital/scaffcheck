@@ -73,6 +73,25 @@ Deno.serve(async (req) => {
         // Link the user to this account so RLS can scope their data.
         // Service role bypasses FLS on the account_id field.
         await base44.asServiceRole.entities.User.update(userId, { account_id: accountId });
+
+        // A new subscription replaces the old one — cancel any other live subscriptions
+        // on the same Stripe customer so nobody is ever billed twice.
+        try {
+          const CANCELLABLE = ['active', 'past_due', 'unpaid', 'trialing', 'incomplete', 'paused'];
+          const subs = await stripe.subscriptions.list({
+            customer: session.customer,
+            status: 'all',
+            limit: 100,
+          });
+          for (const sub of subs.data) {
+            if (sub.id === session.subscription) continue;
+            if (!CANCELLABLE.includes(sub.status)) continue;
+            await stripe.subscriptions.cancel(sub.id);
+            console.log('Cancelled superseded subscription:', sub.id);
+          }
+        } catch (cancelErr) {
+          console.error('Failed to cancel superseded subscriptions:', cancelErr.message);
+        }
         break;
       }
 
@@ -82,6 +101,14 @@ Deno.serve(async (req) => {
           stripe_customer_id: subscription.customer,
         });
         if (accounts && accounts.length > 0) {
+          // Ignore updates for superseded subscriptions on the same customer
+          if (
+            accounts[0].stripe_subscription_id &&
+            accounts[0].stripe_subscription_id !== subscription.id
+          ) {
+            console.log('Ignoring update for superseded subscription:', subscription.id);
+            break;
+          }
           let status = 'active';
           if (['past_due', 'unpaid', 'canceled', 'incomplete_expired'].includes(subscription.status)) {
             status = 'lapsed';
@@ -140,6 +167,14 @@ Deno.serve(async (req) => {
           stripe_customer_id: subscription.customer,
         });
         if (accounts && accounts.length > 0) {
+          // Ignore deletions of superseded subscriptions — only the account's current one matters
+          if (
+            accounts[0].stripe_subscription_id &&
+            accounts[0].stripe_subscription_id !== subscription.id
+          ) {
+            console.log('Ignoring deletion of superseded subscription:', subscription.id);
+            break;
+          }
           await base44.asServiceRole.entities.Account.update(accounts[0].id, {
             subscription_status: 'lapsed',
             cancel_at_period_end: false,
