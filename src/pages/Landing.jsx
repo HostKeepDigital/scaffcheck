@@ -139,6 +139,8 @@ export default function Landing() {
           <nav className="flex items-center gap-4 text-sm">
             <Link to="/about" className="text-slate-400 hover:text-white">About</Link>
             <Link to="/contact" className="text-slate-400 hover:text-white">Contact</Link>
+            <Link to="/terms" className="text-slate-400 hover:text-white">Terms</Link>
+            <Link to="/privacy" className="text-slate-400 hover:text-white">Privacy</Link>
           </nav>
           <div className="text-right">
             <p className="text-xs text-slate-500">Compliance tracking for UK scaffolding contractors</p>
