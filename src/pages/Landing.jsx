@@ -6,6 +6,7 @@ import { PLANS, annualSaving } from '@/lib/stripePrices';
 import BillingToggle from '@/components/BillingToggle';
 import EnterpriseCalculator from '@/components/EnterpriseCalculator';
 import { useState } from 'react';
+import { COMPANY_LEGAL_NAME } from '@/config/company';
 
 export default function Landing() {
   const { isAuthenticated } = useAuth();
@@ -136,15 +137,16 @@ export default function Landing() {
             <HardHat className="w-4 h-4 text-amber-400" />
             <span className="text-sm font-medium">ScaffKeep</span>
           </div>
-          <nav className="flex items-center gap-4 text-sm">
+          <nav className="flex flex-wrap items-center justify-center gap-4 text-sm">
             <Link to="/about" className="text-slate-400 hover:text-white">About</Link>
             <Link to="/contact" className="text-slate-400 hover:text-white">Contact</Link>
             <Link to="/terms" className="text-slate-400 hover:text-white">Terms</Link>
             <Link to="/privacy" className="text-slate-400 hover:text-white">Privacy</Link>
+            <Link to="/dpa" className="text-slate-400 hover:text-white">DPA</Link>
           </nav>
           <div className="text-right">
             <p className="text-xs text-slate-500">Compliance tracking for UK scaffolding contractors</p>
-            <p className="text-xs text-slate-600 mt-1">ScaffKeep — a Keep Technologies Ltd product.</p>
+            <p className="text-xs text-slate-600 mt-1">ScaffKeep — a {COMPANY_LEGAL_NAME} product.</p>
           </div>
         </div>
       </footer>

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import AppHeader from '@/components/AppHeader';
+import { COMPANY_LEGAL_NAME } from '@/config/company';
 
 const CHECKLIST = [
   'Track CISRS cards',
@@ -218,9 +219,9 @@ export default function About() {
 
         <hr className="my-10 border-border" />
 
-        <h2 className="text-2xl font-bold text-foreground">Built by Keep Technologies Ltd</h2>
+        <h2 className="text-2xl font-bold text-foreground">Built by {COMPANY_LEGAL_NAME}</h2>
         <p className="mt-3">
-          ScaffKeep is built and maintained by <strong className="text-foreground">Keep Technologies Ltd</strong>, a UK
+          ScaffKeep is built and maintained by <strong className="text-foreground">{COMPANY_LEGAL_NAME}</strong>, a UK
           software company focused on creating practical compliance tools for the construction trades.
         </p>
         <p className="mt-2">
@@ -231,8 +232,13 @@ export default function About() {
       </main>
 
       <footer className="border-t border-border py-8">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-          <p className="text-xs text-muted-foreground">ScaffKeep — a Keep Technologies Ltd product.</p>
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center space-y-2">
+          <div className="flex flex-wrap justify-center gap-4 text-xs">
+            <Link to="/terms" className="text-muted-foreground hover:text-foreground">Terms</Link>
+            <Link to="/privacy" className="text-muted-foreground hover:text-foreground">Privacy</Link>
+            <Link to="/dpa" className="text-muted-foreground hover:text-foreground">DPA</Link>
+          </div>
+          <p className="text-xs text-muted-foreground">ScaffKeep — a {COMPANY_LEGAL_NAME} product.</p>
         </div>
       </footer>
     </div>

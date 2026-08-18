@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Mail, Building2, Clock } from 'lucide-react';
 import AppHeader from '@/components/AppHeader';
 import { SALES_EMAIL } from '@/lib/contact';
+import { COMPANY_LEGAL_NAME } from '@/config/company';
 
 export default function Contact() {
   return (
@@ -30,9 +31,9 @@ export default function Contact() {
           </div>
           <div className="p-5 rounded-xl border border-border bg-card sm:col-span-2">
             <Building2 className="w-5 h-5 text-amber-500" />
-            <p className="mt-2 font-semibold text-foreground">Keep Technologies Ltd</p>
+            <p className="mt-2 font-semibold text-foreground">{COMPANY_LEGAL_NAME}</p>
             <p className="text-sm text-muted-foreground">
-              ScaffKeep is built and supported in the United Kingdom by Keep Technologies Ltd.
+              ScaffKeep is built and supported in the United Kingdom by {COMPANY_LEGAL_NAME}.
             </p>
           </div>
         </div>
@@ -46,8 +47,13 @@ export default function Contact() {
       </main>
 
       <footer className="border-t border-border py-8">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-          <p className="text-xs text-muted-foreground">ScaffKeep — a Keep Technologies Ltd product.</p>
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center space-y-2">
+          <div className="flex flex-wrap justify-center gap-4 text-xs">
+            <Link to="/terms" className="text-muted-foreground hover:text-foreground">Terms</Link>
+            <Link to="/privacy" className="text-muted-foreground hover:text-foreground">Privacy</Link>
+            <Link to="/dpa" className="text-muted-foreground hover:text-foreground">DPA</Link>
+          </div>
+          <p className="text-xs text-muted-foreground">ScaffKeep — a {COMPANY_LEGAL_NAME} product.</p>
         </div>
       </footer>
     </div>

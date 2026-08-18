@@ -1,22 +1,14 @@
 import { Link } from 'react-router-dom';
 import AppHeader from '@/components/AppHeader';
-
-// ──────────────────────────────────────────────────────────────────────────
-// FILL THESE IN BEFORE PUBLISHING. Change them here only — everything below
-// reads from these constants.
-//
-// COMPANY_NAME: use the name CONFIRMED on the Companies House register right
-// now. If the "Keepsuite Technologies Ltd" rename has landed, use that. If it
-// hasn't yet, use the current registered name (e.g. HostKeep Digital Ltd) and
-// swap it the day the rename confirms — the company NUMBER stays the same
-// either way, so that value never changes.
-// ──────────────────────────────────────────────────────────────────────────
-const COMPANY_NAME = '[Keepsuite Technologies Ltd]';
-const COMPANY_NUMBER = '[17084415]';
-const REGISTERED_OFFICE = '[37 BATTERSBY STREET, INCE, WIGAN, WN2 2LZ]';
-const ICO_NUMBER = '[ZC113158]';
-const CONTACT_EMAIL = '[support@keepsuitetechnologies.co.uk]';
-const LAST_UPDATED = '[18/08/2026]';
+import {
+  COMPANY_LEGAL_NAME,
+  COMPANY_NUMBER,
+  REGISTERED_OFFICE,
+  ICO_NUMBER,
+  CONTACT_EMAIL,
+  BRAND_NAME,
+  LAST_UPDATED,
+} from '@/config/company';
 
 export default function Terms() {
   return (
@@ -30,10 +22,10 @@ export default function Terms() {
         {/* 1 */}
         <h2 className="mt-10 text-2xl font-bold text-foreground">1. About these terms</h2>
         <p className="mt-3">
-          These are the terms on which <strong className="text-foreground">{COMPANY_NAME}</strong> (<strong className="text-foreground">we</strong>, <strong className="text-foreground">us</strong>, <strong className="text-foreground">our</strong>) provides the ScaffKeep service (<strong className="text-foreground">ScaffKeep</strong>, the <strong className="text-foreground">Service</strong>) to you. By creating an account, starting a free trial, or using ScaffKeep, you (<strong className="text-foreground">you</strong>, <strong className="text-foreground">your</strong>, the <strong className="text-foreground">Customer</strong>) agree to these terms. If you are agreeing on behalf of a company or other organisation, you confirm you have authority to bind it, and <strong className="text-foreground">you</strong> means that organisation.
+          These are the terms on which <strong className="text-foreground">{COMPANY_LEGAL_NAME}</strong> (<strong className="text-foreground">we</strong>, <strong className="text-foreground">us</strong>, <strong className="text-foreground">our</strong>) provides the ScaffKeep service (<strong className="text-foreground">ScaffKeep</strong>, the <strong className="text-foreground">Service</strong>) to you. By creating an account, starting a free trial, or using ScaffKeep, you (<strong className="text-foreground">you</strong>, <strong className="text-foreground">your</strong>, the <strong className="text-foreground">Customer</strong>) agree to these terms. If you are agreeing on behalf of a company or other organisation, you confirm you have authority to bind it, and <strong className="text-foreground">you</strong> means that organisation.
         </p>
         <div className="mt-4 rounded-xl border border-border bg-card p-4 text-sm">
-          <p className="font-semibold text-foreground">{COMPANY_NAME}</p>
+          <p className="font-semibold text-foreground">{COMPANY_LEGAL_NAME}</p>
           <p>A company registered in England and Wales</p>
           <p>Company number: {COMPANY_NUMBER}</p>
           <p>Registered office: {REGISTERED_OFFICE}</p>
@@ -41,7 +33,7 @@ export default function Terms() {
           <p>Contact: {CONTACT_EMAIL}</p>
         </div>
         <p className="mt-3">
-          ScaffKeep is a product of {COMPANY_NAME}, part of the Keepsuite Technologies group of products.
+          ScaffKeep is a product of {COMPANY_LEGAL_NAME}, part of the {BRAND_NAME} group of products.
         </p>
 
         {/* 2 */}
@@ -94,8 +86,8 @@ export default function Terms() {
         </p>
         <p className="mt-3">
           <strong className="text-foreground">Price changes.</strong> We may change our prices. We will give you
-          reasonable notice — at least 30 days — before a change takes effect at your next renewal. Prices are exclusive
-          of VAT unless stated otherwise at checkout.
+          reasonable notice — at least 30 days — before a change takes effect at your next renewal. Prices are shown as
+          the total payable. We are not currently registered for VAT, so no VAT is added.
         </p>
 
         {/* 5 */}
@@ -147,8 +139,8 @@ export default function Terms() {
         <p className="mt-3">
           For personal data about your operatives that you put into ScaffKeep, <strong className="text-foreground">you are the
           controller and we are your processor</strong> under UK data protection law. We process that data only to provide
-          the Service and in line with your instructions. This processing is governed by our Privacy Notice and our Data
-          Processing Agreement, which form part of these terms.
+          the Service and in line with your instructions. This processing is governed by our Privacy Notice and our{' '}
+          <Link to="/dpa" className="text-foreground underline">Data Processing Agreement</Link>, which form part of these terms.
         </p>
         <p className="mt-3">
           Your data is kept isolated from other customers, documents are held in private storage, and files are made
@@ -213,7 +205,8 @@ export default function Terms() {
           These terms apply for as long as you use ScaffKeep. You may end them by cancelling your subscription. We may end
           them on reasonable notice, or immediately if you seriously breach them. When these terms end, your right to use
           the Service stops. You can export your data before your account is closed; afterwards we will delete or return
-          your data in line with our Privacy Notice and Data Processing Agreement.
+          your data in line with our Privacy Notice and{' '}
+          <Link to="/dpa" className="text-foreground underline">Data Processing Agreement</Link>.
         </p>
 
         {/* 15 */}
@@ -232,7 +225,42 @@ export default function Terms() {
         </p>
 
         {/* 17 */}
-        <h2 className="mt-8 text-2xl font-bold text-foreground">17. Contact</h2>
+        <h2 className="mt-8 text-2xl font-bold text-foreground">17. Assignment</h2>
+        <p className="mt-3">
+          We may transfer our rights and obligations under these terms to another business, for example if we sell or
+          reorganise ScaffKeep; we will tell you if this happens and it will not reduce your rights. You may not transfer
+          your rights or obligations without our written consent.
+        </p>
+
+        {/* 18 */}
+        <h2 className="mt-8 text-2xl font-bold text-foreground">18. Third-party rights</h2>
+        <p className="mt-3">
+          These terms are between you and us. No one else has any right to enforce them under the Contracts (Rights of
+          Third Parties) Act 1999.
+        </p>
+
+        {/* 19 */}
+        <h2 className="mt-8 text-2xl font-bold text-foreground">19. Entire agreement</h2>
+        <p className="mt-3">
+          These terms, together with our Privacy Notice and Data Processing Agreement, are the entire agreement between us
+          about ScaffKeep and replace any earlier discussions or arrangements.
+        </p>
+
+        {/* 20 */}
+        <h2 className="mt-8 text-2xl font-bold text-foreground">20. No waiver</h2>
+        <p className="mt-3">
+          If we do not enforce a term, or delay in doing so, that is not a waiver of our rights, and we may still enforce
+          it later.
+        </p>
+
+        {/* 21 */}
+        <h2 className="mt-8 text-2xl font-bold text-foreground">21. If part of these terms cannot be enforced</h2>
+        <p className="mt-3">
+          If any part of these terms is found to be unlawful or unenforceable, the rest of the terms remain in full force.
+        </p>
+
+        {/* 22 */}
+        <h2 className="mt-8 text-2xl font-bold text-foreground">22. Contact</h2>
         <p className="mt-3">
           If you have any questions about these terms, contact us at{' '}
           <a href={`mailto:${CONTACT_EMAIL}`} className="text-foreground underline">{CONTACT_EMAIL}</a>.
@@ -241,11 +269,12 @@ export default function Terms() {
 
       <footer className="border-t border-border py-8">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center space-y-2">
-          <div className="flex justify-center gap-4 text-xs">
+          <div className="flex flex-wrap justify-center gap-4 text-xs">
             <Link to="/terms" className="text-muted-foreground hover:text-foreground">Terms</Link>
             <Link to="/privacy" className="text-muted-foreground hover:text-foreground">Privacy</Link>
+            <Link to="/dpa" className="text-muted-foreground hover:text-foreground">DPA</Link>
           </div>
-          <p className="text-xs text-muted-foreground">ScaffKeep — a {COMPANY_NAME} product.</p>
+          <p className="text-xs text-muted-foreground">ScaffKeep — a {COMPANY_LEGAL_NAME} product.</p>
         </div>
       </footer>
     </div>
