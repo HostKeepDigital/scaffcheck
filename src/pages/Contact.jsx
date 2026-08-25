@@ -1,8 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Mail, Building2, Clock } from 'lucide-react';
 import AppHeader from '@/components/AppHeader';
-import { SALES_EMAIL } from '@/lib/contact';
-import { COMPANY_LEGAL_NAME } from '@/config/company';
+import { COMPANY_LEGAL_NAME, CONTACT_EMAIL } from '@/config/company';
 
 export default function Contact() {
   return (
@@ -20,8 +19,8 @@ export default function Contact() {
           <div className="p-5 rounded-xl border border-border bg-card">
             <Mail className="w-5 h-5 text-amber-500" />
             <p className="mt-2 font-semibold text-foreground">Email us</p>
-            <a href={`mailto:${SALES_EMAIL}`} className="text-sm text-muted-foreground underline break-all">
-              {SALES_EMAIL}
+            <a href={`mailto:${CONTACT_EMAIL}`} className="text-sm text-muted-foreground underline break-all">
+              {CONTACT_EMAIL}
             </a>
           </div>
           <div className="p-5 rounded-xl border border-border bg-card">
@@ -39,7 +38,7 @@ export default function Contact() {
         </div>
 
         <div className="mt-8">
-          <a href={`mailto:${SALES_EMAIL}?subject=ScaffKeep%20enquiry`}
+          <a href={`mailto:${CONTACT_EMAIL}?subject=%5BScaffKeep%5D%20Enquiry`}
             className="inline-flex items-center justify-center h-11 px-6 rounded-md bg-amber-500 hover:bg-amber-600 text-white font-semibold">
             <Mail className="w-4 h-4 mr-2" /> Send us an email
           </a>
