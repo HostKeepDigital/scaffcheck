@@ -8,6 +8,7 @@ import RAGBadge from '@/components/RAGBadge';
 import DocStatusBadge from '@/components/DocStatusBadge';
 import OperativeForm from '@/components/OperativeForm';
 import DocumentForm from '@/components/DocumentForm';
+import InviteSentDialog from '@/components/InviteSentDialog';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Plus, FileDown, Mail, Pencil, Trash2, Loader2, ChevronLeft, History, Trash } from 'lucide-react';
@@ -26,6 +27,7 @@ export default function OperativeDetail() {
   const [showHistory, setShowHistory] = useState(null);
   const [deleteDocId, setDeleteDocId] = useState(null);
   const [inviting, setInviting] = useState(false);
+  const [sentInvite, setSentInvite] = useState(null);
   const [reporting, setReporting] = useState(false);
 
   const { data, isLoading: loading, refetch } = useQuery({
@@ -101,7 +103,7 @@ export default function OperativeDetail() {
         alert('Failed to send invite: ' + res.data.error);
         return;
       }
-      alert(`Invite sent to ${operative.email}. Link: ${uploadUrl}`);
+      setSentInvite({ email: operative.email, uploadUrl });
     } catch (err) {
       alert('Failed to send invite: ' + (err.message || 'Unknown error'));
     } finally {
@@ -279,6 +281,8 @@ export default function OperativeDetail() {
         onSaved={loadData}
         onCreate={createDocMutation.mutateAsync}
       />
+
+      {sentInvite && <InviteSentDialog invite={sentInvite} onClose={() => setSentInvite(null)} />}
 
       <AlertDialog open={showDelete} onOpenChange={setShowDelete}>
         <AlertDialogContent>
