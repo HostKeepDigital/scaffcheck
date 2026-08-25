@@ -5,10 +5,24 @@ const DOC_TYPES = ['CISRS Card', 'Public Liability Insurance', 'Employers Liabil
 export default async function (req) {
   try {
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
-    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    let user = null;
+    try {
+      user = await base44.auth.me();
+    } catch (_e) {
+      user = null;
+    }
 
-    const { file_uri, expected_type } = await req.json();
+    const { file_uri, expected_type, token } = await req.json();
+
+    if (!user) {
+      if (!token) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      const invites = await base44.asServiceRole.entities.UploadInvite.filter({ token, is_active: true });
+      const invite = invites?.[0];
+      if (!invite || new Date() > new Date(invite.expires_at)) {
+        return Response.json({ error: 'Invalid or expired invite link' }, { status: 403 });
+      }
+    }
+
     if (!file_uri) return Response.json({ error: 'Missing file_uri' }, { status: 400 });
 
     const expected = DOC_TYPES.includes(expected_type) ? expected_type : null;

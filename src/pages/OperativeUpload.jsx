@@ -60,7 +60,7 @@ export default function OperativeUpload() {
       updateDoc(type, { fileUri: file_uri, fileName: file.name, uploading: false, extracting: true });
       let result = null;
       try {
-        const response = await base44.functions.invoke('extractDocumentDates', { file_uri, expected_type: type });
+        const response = await base44.functions.invoke('extractDocumentDates', { file_uri, expected_type: type, token });
         result = response.data;
       } catch (analysisError) {
         console.error('Document analysis failed:', analysisError);
