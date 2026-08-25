@@ -54,8 +54,8 @@ Deno.serve(async (req) => {
         const contractorEmail = users[0].email;
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: contractorEmail,
-          subject: `ScaffKeep: ${operative.full_name} has submitted documents`,
-          body: `Operative ${operative.full_name} has uploaded the following compliance documents via their secure link:\n\n${uploadedTypes.map(t => `• ${t}`).join('\n')}\n\nPlease review them in ScaffKeep.\n\nScaffKeep — a Keep Technologies Ltd product.`,
+          subject: `[ScaffKeep] ${operative.full_name} has submitted documents`,
+          body: `Operative ${operative.full_name} has uploaded the following compliance documents via their secure link:\n\n${uploadedTypes.map(t => `• ${t}`).join('\n')}\n\nPlease review them in ScaffKeep.\n\nScaffKeep — a Keepsuite Technologies Ltd product.`,
         });
       }
     }

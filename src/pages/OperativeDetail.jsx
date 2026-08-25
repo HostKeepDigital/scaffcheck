@@ -94,8 +94,8 @@ export default function OperativeDetail() {
       const uploadUrl = `${window.location.origin}/upload/${token}`;
       await base44.integrations.Core.SendEmail({
         to: operative.email,
-        subject: 'Upload your compliance documents — ScaffKeep',
-        body: `Hi ${operative.full_name},\n\nPlease upload your compliance documents (CISRS card, insurance, RAMS) using this secure link:\n\n${uploadUrl}\n\nThe link is valid for 30 days. You can upload from your phone.\n\nScaffKeep\n\nScaffKeep — a Keep Technologies Ltd product.`,
+        subject: '[ScaffKeep] Upload your compliance documents',
+        body: `Hi ${operative.full_name},\n\nPlease upload your compliance documents (CISRS card, insurance, RAMS) using this secure link:\n\n${uploadUrl}\n\nThe link is valid for 30 days. You can upload from your phone.\n\nScaffKeep\n\nScaffKeep — a Keepsuite Technologies Ltd product.`,
       });
       alert(`Invite sent to ${operative.email}. Link: ${uploadUrl}`);
     } catch (err) {
