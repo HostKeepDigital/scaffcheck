@@ -92,11 +92,15 @@ export default function OperativeDetail() {
         is_active: true,
       });
       const uploadUrl = `${window.location.origin}/upload/${token}`;
-      await base44.integrations.Core.SendEmail({
-        to: operative.email,
-        subject: '[ScaffKeep] Upload your compliance documents',
-        body: `Hi ${operative.full_name},\n\nPlease upload your compliance documents (CISRS card, insurance, RAMS) using this secure link:\n\n${uploadUrl}\n\nThe link is valid for 30 days. You can upload from your phone.\n\nScaffKeep\n\nScaffKeep — a Keepsuite Technologies Ltd product.`,
+      const res = await base44.functions.invoke('sendOperativeInvite', {
+        operative_email: operative.email,
+        operative_name: operative.full_name,
+        upload_url: uploadUrl,
       });
+      if (res?.data?.error) {
+        alert('Failed to send invite: ' + res.data.error);
+        return;
+      }
       alert(`Invite sent to ${operative.email}. Link: ${uploadUrl}`);
     } catch (err) {
       alert('Failed to send invite: ' + (err.message || 'Unknown error'));
