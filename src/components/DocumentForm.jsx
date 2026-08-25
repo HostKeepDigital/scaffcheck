@@ -123,7 +123,12 @@ export default function DocumentForm({ open, onClose, operativeId, accountId, on
           <div className="space-y-1.5">
             <Label>Document file *</Label>
             <div className="border-2 border-dashed border-border rounded-lg p-4 text-center">
-              {fileUri ? (
+              {uploading || extracting ? (
+                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  {uploading ? 'Uploading…' : 'Checking document…'}
+                </div>
+              ) : fileUri ? (
                 <div className="flex items-center justify-center gap-2 text-sm text-green-600 dark:text-green-400">
                   <Check className="w-4 h-4" /> <span className="truncate max-w-[200px]">{fileName}</span>
                   <Button type="button" variant="ghost" size="sm" className="ml-2 text-xs" onClick={() => { setFileUri(''); setFileName(''); }}>
@@ -133,17 +138,9 @@ export default function DocumentForm({ open, onClose, operativeId, accountId, on
               ) : (
                 <label className="cursor-pointer flex flex-col items-center gap-1">
                   <Upload className="w-6 h-6 text-muted-foreground/70" />
-                  <span className="text-sm text-muted-foreground">
-                    {uploading ? 'Uploading...' : extracting ? 'Reading document...' : 'Click to upload'}
-                  </span>
-                  <input type="file" className="hidden" accept=".pdf,.png,.jpg,.jpeg" onChange={handleFileChange} disabled={uploading || extracting} />
+                  <span className="text-sm text-muted-foreground">Click to upload</span>
+                  <input type="file" className="hidden" accept=".pdf,.png,.jpg,.jpeg" onChange={handleFileChange} />
                 </label>
-              )}
-              {(uploading || extracting) && (
-                <div className="mt-2 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
-                  <Loader2 className="w-3 h-3 animate-spin" />
-                  {uploading ? 'Uploading...' : 'AI extracting dates...'}
-                </div>
               )}
             </div>
           </div>

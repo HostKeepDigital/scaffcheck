@@ -167,22 +167,22 @@ export default function OperativeUpload() {
                   <span className="font-medium text-sm">{type}</span>
                 </div>
 
-                {!d.fileUri ? (
+                {d.uploading || d.extracting ? (
+                  <div className="border-2 border-dashed border-border rounded-lg p-4 text-center">
+                    <div className="flex flex-col items-center gap-1">
+                      <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground">{d.uploading ? 'Uploading…' : 'Checking document…'}</span>
+                    </div>
+                  </div>
+                ) : !d.fileUri ? (
                   <label className="block">
                     <div className="border-2 border-dashed border-border rounded-lg p-4 text-center cursor-pointer hover:border-amber-500 transition">
-                      {d.uploading || d.extracting ? (
-                        <div className="flex flex-col items-center gap-1">
-                          <Loader2 className="w-5 h-5 animate-spin text-amber-400" />
-                          <span className="text-xs text-muted-foreground">{d.uploading ? 'Uploading...' : 'Reading document...'}</span>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col items-center gap-1">
-                          <Upload className="w-5 h-5 text-muted-foreground/70" />
-                          <span className="text-xs text-muted-foreground">Tap to upload</span>
-                        </div>
-                      )}
+                      <div className="flex flex-col items-center gap-1">
+                        <Upload className="w-5 h-5 text-muted-foreground/70" />
+                        <span className="text-xs text-muted-foreground">Tap to upload</span>
+                      </div>
                     </div>
-                    <input type="file" className="hidden" accept=".pdf,.png,.jpg,.jpeg" onChange={(e) => handleFileChange(type, e)} disabled={d.uploading || d.extracting} />
+                    <input type="file" className="hidden" accept=".pdf,.png,.jpg,.jpeg" onChange={(e) => handleFileChange(type, e)} />
                   </label>
                 ) : (
                   <div className="space-y-2">
