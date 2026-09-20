@@ -38,6 +38,35 @@
     "uploaded_at": {
       "type": "string",
       "format": "date-time"
+    },
+    "verdict_outcome": {
+      "type": "string",
+      "enum": [
+        "clean",
+        "warn"
+      ]
+    },
+    "verdict_message": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "override_confirmed": {
+      "type": "boolean",
+      "default": false
+    },
+    "issue_date_source": {
+      "type": "string",
+      "enum": [
+        "ai",
+        "manual"
+      ]
+    },
+    "expiry_date_source": {
+      "type": "string",
+      "enum": [
+        "ai",
+        "manual"
+      ]
     }
   },
   "required": [
