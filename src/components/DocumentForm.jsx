@@ -93,6 +93,15 @@ export default function DocumentForm({ open, onClose, operativeId, accountId, on
         expiry_date: expiryDate,
         uploaded_at: new Date().toISOString(),
       };
+      if (verdict && (verdict.outcome === 'clean' || verdict.outcome === 'warn')) {
+        docData.verdict_outcome = verdict.outcome;
+      }
+      if (verdict && typeof verdict.message === 'string' && verdict.message.trim()) {
+        docData.verdict_message = verdict.message.slice(0, 500);
+      }
+      docData.override_confirmed = !!overrideConfirmed;
+      if (issueDate) docData.issue_date_source = aiIssue ? 'ai' : 'manual';
+      if (expiryDate) docData.expiry_date_source = aiExpiry ? 'ai' : 'manual';
       if (onCreate) {
         await onCreate(docData);
       } else {
