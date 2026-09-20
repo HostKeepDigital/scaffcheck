@@ -84,12 +84,25 @@ export default function OperativeUpload() {
     try {
       const documents = REQUIRED_DOC_TYPES
         .filter((t) => docs[t].fileUri && isDocReady(docs[t]))
-        .map((t) => ({
-          document_type: t,
-          file_uri: docs[t].fileUri,
-          issue_date: docs[t].issueDate || null,
-          expiry_date: docs[t].expiryDate || null,
-        }));
+        .map((t) => {
+          const d = docs[t];
+          const entry = {
+            document_type: t,
+            file_uri: d.fileUri,
+            issue_date: d.issueDate || null,
+            expiry_date: d.expiryDate || null,
+            override_confirmed: !!d.overrideConfirmed,
+          };
+          if (d.verdict && (d.verdict.outcome === 'clean' || d.verdict.outcome === 'warn')) {
+            entry.verdict_outcome = d.verdict.outcome;
+          }
+          if (d.verdict && typeof d.verdict.message === 'string' && d.verdict.message.trim()) {
+            entry.verdict_message = d.verdict.message.slice(0, 500);
+          }
+          if (d.issueDate) entry.issue_date_source = d.aiIssue ? 'ai' : 'manual';
+          if (d.expiryDate) entry.expiry_date_source = d.aiExpiry ? 'ai' : 'manual';
+          return entry;
+        });
       if (documents.length === 0) return;
       await base44.functions.invoke('submitOperativeDocuments', { token, documents });
       setSubmitted(true);
@@ -141,7 +154,8 @@ export default function OperativeUpload() {
   const hasAnyFile = Object.values(docs).some((d) => d.fileUri);
   const hasBlockedDoc = Object.values(docs).some((d) => d.fileUri && d.verdict?.outcome === 'block');
   const hasUnconfirmedDoc = Object.values(docs).some((d) => d.fileUri && d.verdict?.outcome === 'warn' && !d.overrideConfirmed);
-  const canSubmit = hasAnyFile && !hasBlockedDoc && !hasUnconfirmedDoc;
+  const hasMissingExpiry = Object.values(docs).some((d) => d.fileUri && !d.expiryDate);
+  const canSubmit = hasAnyFile && !hasBlockedDoc && !hasUnconfirmedDoc && !hasMissingExpiry;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -229,6 +243,7 @@ export default function OperativeUpload() {
         {!hasAnyFile && <p className="text-center text-xs text-muted-foreground mt-2">Upload at least one document to submit</p>}
         {hasAnyFile && hasBlockedDoc && <p className="text-center text-xs text-destructive mt-2">Please replace the document flagged as the wrong type.</p>}
         {hasAnyFile && !hasBlockedDoc && hasUnconfirmedDoc && <p className="text-center text-xs text-amber-600 dark:text-amber-400 mt-2">Please confirm the flagged document above before submitting.</p>}
+        {hasAnyFile && !hasBlockedDoc && !hasUnconfirmedDoc && hasMissingExpiry && <p className="text-center text-xs text-amber-600 dark:text-amber-400 mt-2">Please add an expiry date for each document before submitting.</p>}
       </div>
     </div>
   );
