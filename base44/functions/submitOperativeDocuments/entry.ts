@@ -29,19 +29,41 @@ Deno.serve(async (req) => {
     }
     const operative = operatives[0];
 
+    // Validate all documents up-front (all-or-nothing)
+    const invalid = documents.filter((d) => !d?.document_type || !d?.file_uri || !d?.expiry_date);
+    if (invalid.length > 0) {
+      return Response.json(
+        { error: 'Every document must have a type, a file and an expiry date.' },
+        { status: 400 }
+      );
+    }
+
     // Create compliance document records
     const uploadedTypes = [];
     for (const doc of documents) {
-      if (!doc.document_type || !doc.file_uri) continue;
-      await base44.asServiceRole.entities.ComplianceDocument.create({
+      const record: Record<string, unknown> = {
         account_id: invite.account_id,
         operative_id: invite.operative_id,
         document_type: doc.document_type,
         file_uri: doc.file_uri,
         issue_date: doc.issue_date || null,
-        expiry_date: doc.expiry_date || null,
+        expiry_date: doc.expiry_date,
         uploaded_at: new Date().toISOString(),
-      });
+        override_confirmed: doc.override_confirmed === true,
+      };
+      if (doc.verdict_outcome === 'clean' || doc.verdict_outcome === 'warn') {
+        record.verdict_outcome = doc.verdict_outcome;
+      }
+      if (typeof doc.verdict_message === 'string' && doc.verdict_message.trim()) {
+        record.verdict_message = doc.verdict_message.slice(0, 500);
+      }
+      if (doc.issue_date_source === 'ai' || doc.issue_date_source === 'manual') {
+        record.issue_date_source = doc.issue_date_source;
+      }
+      if (doc.expiry_date_source === 'ai' || doc.expiry_date_source === 'manual') {
+        record.expiry_date_source = doc.expiry_date_source;
+      }
+      await base44.asServiceRole.entities.ComplianceDocument.create(record);
       uploadedTypes.push(doc.document_type);
     }
 
